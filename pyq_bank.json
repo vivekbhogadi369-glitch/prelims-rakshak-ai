@@ -1,0 +1,22 @@
+[
+  {
+    "year": 2023,
+    "exam": "UPSC Prelims",
+    "paper": "GS1",
+    "subject": "Economy",
+    "topic": "Growth rate",
+    "question_text": "With reference to the Indian economy, consider the following statements...",
+    "source": "Official UPSC",
+    "source_url": "https://upsc.gov.in/"
+  },
+  {
+    "year": 2022,
+    "exam": "UPSC Prelims",
+    "paper": "GS1",
+    "subject": "History",
+    "topic": "Indus town planning",
+    "question_text": "Which one of the following statements about the Indus Valley Civilization is correct?",
+    "source": "Official UPSC",
+    "source_url": "https://upsc.gov.in/"
+  }
+]
