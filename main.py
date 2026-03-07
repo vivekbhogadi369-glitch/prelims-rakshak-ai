@@ -1,7 +1,7 @@
 import os
 import re
 from datetime import date
-
+from PyPDF2 import PdfReader
 from openai import OpenAI
 from telegram import Update
 from telegram.ext import (
