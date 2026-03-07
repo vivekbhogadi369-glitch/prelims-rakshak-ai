@@ -24,24 +24,34 @@ if not OPENAI_API_KEY:
 
 client = OpenAI(api_key=OPENAI_API_KEY)
 
-# ===================== Faculty PDF =====================
-PDF_PATH = "docs/Class 6 History Our Pasts 1.pdf"
+# ===================== Faculty PDFs =====================
+def load_all_pdfs():
+    text = ""
+    docs_folder = "docs"
 
-
-def load_pdf_text():
-    try:
-        reader = PdfReader(PDF_PATH)
-        text = ""
-        for page in reader.pages:
-            page_text = page.extract_text()
-            if page_text:
-                text += page_text + "\n"
-        return text.strip()
-    except Exception:
+    if not os.path.exists(docs_folder):
         return ""
 
+    for file in os.listdir(docs_folder):
+        if file.lower().endswith(".pdf"):
+            path = os.path.join(docs_folder, file)
 
-PDF_TEXT = load_pdf_text()
+            try:
+                reader = PdfReader(path)
+
+                for page in reader.pages:
+                    page_text = page.extract_text()
+
+                    if page_text:
+                        text += page_text + "\n"
+
+            except Exception:
+                continue
+
+    return text.strip()
+
+
+PDF_TEXT = load_all_pdfs()
 
 # ===================== Daily Limit =====================
 DAILY_LIMIT = int(os.getenv("DAILY_LIMIT", "10"))
