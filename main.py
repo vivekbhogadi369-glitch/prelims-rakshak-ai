@@ -151,7 +151,7 @@ def get_relevant_context(topic: str, subject: str, max_results: int = 5) -> str:
     """
     Searches the OpenAI vector store and returns joined text chunks.
     """
-    query = f"{topic} {subject}".strip()
+    query = f"UPSC exam concept explanation {topic} in Indian {subject}".strip()
 
     try:
         page = client.vector_stores.search(
