@@ -15,9 +15,18 @@ from telegram.ext import (
 # ===================== ENV =====================
 TOKEN = os.getenv("TELEGRAM_TOKEN")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-# ===================== Faculty PDF =====================
 
+if not TOKEN:
+    raise ValueError("Missing TELEGRAM_TOKEN")
+
+if not OPENAI_API_KEY:
+    raise ValueError("Missing OPENAI_API_KEY")
+
+client = OpenAI(api_key=OPENAI_API_KEY)
+
+# ===================== Faculty PDF =====================
 PDF_PATH = "docs/Class 6 History Our Pasts 1.pdf"
+
 
 def load_pdf_text():
     try:
@@ -27,18 +36,12 @@ def load_pdf_text():
             page_text = page.extract_text()
             if page_text:
                 text += page_text + "\n"
-        return text
+        return text.strip()
     except Exception:
         return ""
 
+
 PDF_TEXT = load_pdf_text()
-if not TOKEN:
-    raise ValueError("Missing TELEGRAM_TOKEN")
-
-if not OPENAI_API_KEY:
-    raise ValueError("Missing OPENAI_API_KEY")
-
-client = OpenAI(api_key=OPENAI_API_KEY)
 
 # ===================== Daily Limit =====================
 DAILY_LIMIT = int(os.getenv("DAILY_LIMIT", "10"))
@@ -53,24 +56,29 @@ if _raw_admin:
 
 DAILY_USAGE = {}
 
+
 def _today_key(user_id: int) -> str:
     return f"{user_id}:{date.today().isoformat()}"
+
 
 def used_today(user_id: int) -> int:
     if user_id in ADMIN_USER_IDS:
         return 0
     return DAILY_USAGE.get(_today_key(user_id), 0)
 
+
 def can_use_today(user_id: int) -> bool:
     if user_id in ADMIN_USER_IDS:
         return True
     return used_today(user_id) < DAILY_LIMIT
+
 
 def inc_today(user_id: int) -> None:
     if user_id in ADMIN_USER_IDS:
         return
     k = _today_key(user_id)
     DAILY_USAGE[k] = DAILY_USAGE.get(k, 0) + 1
+
 
 # ===================== Allowed Subjects =====================
 ALLOWED_SUBJECTS = [
@@ -88,8 +96,8 @@ ALLOWED_SUBJECTS = [
     "disaster management",
 ]
 
-# ===================== Input parsing =====================
 
+# ===================== Input parsing =====================
 def parse_topic_subject(text: str):
     """
     Expected:
@@ -115,6 +123,7 @@ def parse_topic_subject(text: str):
 
     return topic, subject
 
+
 def user_requested_telugu(text: str) -> bool:
     if not text:
         return False
@@ -123,6 +132,7 @@ def user_requested_telugu(text: str) -> bool:
     if "telugu" in text.lower() or "తెలుగు" in text:
         return True
     return False
+
 
 def normalize_subject(subject: str) -> str:
     s = (subject or "").strip().lower()
@@ -152,13 +162,85 @@ def normalize_subject(subject: str) -> str:
 
     return mapping.get(s, s)
 
+
 def is_allowed_subject(subject: str) -> bool:
     s = normalize_subject(subject)
     return s in [normalize_subject(x) for x in ALLOWED_SUBJECTS]
 
-# ===================== AI Generation =====================
 
-def build_prompt(topic: str, subject: str, telugu: bool) -> str:
+def keyword_list(text: str) -> list[str]:
+    words = re.findall(r"[a-zA-Z]{3,}", text.lower())
+    stop = {
+        "the", "and", "from", "with", "into", "about", "paper", "prelims",
+        "topic", "subject", "history", "polity", "economy", "geography",
+        "science", "technology", "environment", "disaster", "management",
+        "indian", "india"
+    }
+    out = []
+    seen = set()
+    for w in words:
+        if w not in stop and w not in seen:
+            seen.add(w)
+            out.append(w)
+    return out[:10]
+
+
+# ===================== Simple document retrieval =====================
+def split_text_into_chunks(text: str, chunk_size: int = 1800):
+    if not text:
+        return []
+
+    cleaned = re.sub(r"\s+", " ", text).strip()
+    chunks = []
+    start = 0
+    n = len(cleaned)
+
+    while start < n:
+        end = min(start + chunk_size, n)
+        chunk = cleaned[start:end]
+
+        if end < n:
+            last_period = chunk.rfind(". ")
+            last_space = chunk.rfind(" ")
+            if last_period > 800:
+                end = start + last_period + 1
+                chunk = cleaned[start:end]
+            elif last_space > 1200:
+                end = start + last_space
+                chunk = cleaned[start:end]
+
+        chunks.append(chunk.strip())
+        start = end
+
+    return chunks
+
+
+DOC_CHUNKS = split_text_into_chunks(PDF_TEXT)
+
+
+def get_relevant_context(topic: str, subject: str, max_chunks: int = 4) -> str:
+    if not DOC_CHUNKS:
+        return ""
+
+    keys = keyword_list(topic + " " + subject)
+    if not keys:
+        return ""
+
+    scored = []
+    for chunk in DOC_CHUNKS:
+        chunk_lower = chunk.lower()
+        score = sum(1 for k in keys if k in chunk_lower)
+        if score > 0:
+            scored.append((score, chunk))
+
+    scored.sort(key=lambda x: x[0], reverse=True)
+    top_chunks = [chunk for _, chunk in scored[:max_chunks]]
+
+    return "\n\n".join(top_chunks).strip()
+
+
+# ===================== AI Generation =====================
+def build_prompt(topic: str, subject: str, telugu: bool, context_text: str) -> str:
     language_line = (
         "Write the entire response in Telugu."
         if telugu
@@ -166,90 +248,33 @@ def build_prompt(topic: str, subject: str, telugu: bool) -> str:
     )
 
     return f"""
-You are Prelims Rakshak AI, a high-level UPSC General Studies mentor trained to produce faculty-grade exam material.
+You are Prelims Rakshak AI.
 
-Topic strictly to be explained: {topic}
-Subject area: {subject}
+Student topic: {topic}
+Subject: {subject}
+
+Relevant faculty document excerpts:
+{context_text}
 
 {language_line}
 
-Non-negotiable rules:
-1. Do NOT change the topic.
-2. Do NOT introduce unrelated concepts.
-3. All notes, MCQs, PYQ trend remarks, and mains answer must revolve around the topic: {topic}.
-4. Stay only within UPSC General Studies scope.
-5. English is default. Telugu only if explicitly requested.
-6. Maintain serious UPSC standard, not school-level or beginner-level simplification.
-7. Do not ask the student to paste notes or sources.
-8. Do not mention backend, prompt, model, or training data.
-9. Keep formatting clean for Telegram mobile reading.
-10. Do not use markdown code blocks.
+Strict rules:
+1. Answer ONLY from the faculty document excerpts given above.
+2. Do NOT use outside knowledge.
+3. Do NOT guess, assume, or add facts not present in the excerpts.
+4. If the excerpts are insufficient, reply exactly:
+Answer not found in the uploaded faculty document.
+5. Keep the answer short, clear, and exam-oriented.
+6. Do not mention AI, prompt, model, backend, training data, or document retrieval.
+7. Do not generate MCQs, mains answers, PYQ frequency, or mindmaps unless clearly supported by the excerpt.
+8. Do not change the topic.
 
-Now generate the response in exactly this format:
-
-1️⃣ QUICK REVISION NOTES
-- Around 200 words
-- Exam-oriented and precise
-- Include the most important facts, concepts, distinctions, and common confusions
-- Add a line: PYQ Frequency: Low / Medium / High
-- Add a line: UPSC Focus Areas: mention 3-5 sub-areas from which UPSC can ask
-- Add a short text mindmap using arrows or branches
-
-2️⃣ UPSC PRELIMS MCQs
-Create 5 genuinely tough UPSC-standard MCQs on the topic.
-
-Mandatory MCQ rules:
-- Questions must resemble UPSC Prelims style, not coaching beginner style
-- Prefer statement-based questions
-- Use formats like:
-  - Consider the following statements
-  - Which of the above is/are correct
-  - With reference to...
-  - Which one of the following...
-  - Match the following, only if suitable
-- Make distractors very close and plausible
-- Test conceptual clarity, factual precision, and elimination ability
-- Avoid obvious clues
-- Avoid direct definition-only questions unless twisted analytically
-- At least 3 out of 5 MCQs must have 2 or 3 statements
-- Options should use UPSC style where suitable:
-  A. 1 only
-  B. 2 and 3 only
-  C. 1, 2 and 3
-  D. None of the above
-  or similar close combinations
-- After each MCQ, give:
-  Correct Answer:
-  Elimination Logic:
-  Why the other options are wrong:
-  PYQ Trend:
-
-Important:
-- Elimination Logic must be sharp and exam-like
-- Why the other options are wrong must specifically address each wrong choice
-- Do not make the correct answer too easy to spot
-- Questions must be at the level of actual UPSC prelims, not state board objective questions
-
-3️⃣ UPSC MAINS SAMPLE ANSWER
-- Write one model answer in UPSC style on the same topic
-- Use this structure exactly:
-Introduction:
-Body:
-Conclusion:
-- Use around 150 words for narrow factual themes
-- Use around 250 words for broader analytical themes
-- Keep it crisp, balanced, and examiner-friendly
-- Include 3-5 strong keywords within the answer naturally
-
-Final quality check before answering:
-- Ensure the topic has not drifted
-- Ensure MCQs are tough
-- Ensure explanations are specific
-- Ensure output is readable on Telegram
+Now answer the student's topic using only the faculty document excerpts.
 """
 
-def generate_ai_answer(topic: str, subject: str, telugu: bool) -> str:
-    prompt = build_prompt(topic, subject, telugu)
+
+def generate_ai_answer(topic: str, subject: str, telugu: bool, context_text: str) -> str:
+    prompt = build_prompt(topic, subject, telugu, context_text)
 
     response = client.chat.completions.create(
         model="gpt-4o-mini",
@@ -257,9 +282,9 @@ def generate_ai_answer(topic: str, subject: str, telugu: bool) -> str:
             {
                 "role": "system",
                 "content": (
-                    "You are a strict UPSC examiner and mentor. "
-                    "Your MCQs must be tough, close, elimination-based, and UPSC-like. "
-                    "Avoid generic or easy coaching-style questions."
+                    "You must answer strictly from provided document excerpts only. "
+                    "If the answer is not supported by the excerpts, say exactly: "
+                    "'Answer not found in the uploaded faculty document.'"
                 ),
             },
             {
@@ -267,11 +292,12 @@ def generate_ai_answer(topic: str, subject: str, telugu: bool) -> str:
                 "content": prompt,
             },
         ],
-        temperature=0.4,
-        max_tokens=2200,
+        temperature=0.1,
+        max_tokens=700,
     )
 
     return response.choices[0].message.content.strip()
+
 
 def split_long_message(text: str, limit: int = 3500):
     parts = []
@@ -285,21 +311,21 @@ def split_long_message(text: str, limit: int = 3500):
         parts.append(text)
     return parts
 
-# ===================== Handlers =====================
 
+# ===================== Handlers =====================
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = (
         "Hello 👋 Prelims Rakshak AI is live.\n\n"
+        "Current mode: Answering from uploaded faculty document only.\n\n"
         "Send your topic in this format:\n"
         "<Topic> from <Subject>\n\n"
         "Example:\n"
-        "Indus town planning from history\n\n"
-        "Current subjects:\n"
-        "History, Polity, Economy, Geography, Science and Technology, Environment, Disaster Management\n\n"
+        "Harappan civilization from history\n\n"
         "Default language: English\n"
         "Telugu only if asked."
     )
     await update.message.reply_text(msg)
+
 
 async def limit_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
@@ -308,6 +334,7 @@ async def limit_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     used = used_today(user_id)
     await update.message.reply_text(f"Daily usage: {used}/{DAILY_LIMIT}")
+
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
@@ -325,7 +352,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "Please use this format:\n"
             "<Topic> from <Subject>\n\n"
             "Example:\n"
-            "Indus town planning from history"
+            "Harappan civilization from history"
         )
         return
 
@@ -337,17 +364,30 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
+    if not PDF_TEXT:
+        await update.message.reply_text(
+            "No readable faculty document found. Please upload a valid PDF."
+        )
+        return
+
     telugu = user_requested_telugu(text)
+    context_text = get_relevant_context(topic, subject_normalized)
+
+    if not context_text:
+        await update.message.reply_text(
+            "Answer not found in the uploaded faculty document."
+        )
+        return
 
     inc_today(user_id)
 
-    await update.message.reply_text("Generating UPSC-grade answer...")
+    await update.message.reply_text("Searching faculty document...")
 
     try:
-        final = generate_ai_answer(topic, subject_normalized, telugu)
+        final = generate_ai_answer(topic, subject_normalized, telugu, context_text)
     except Exception:
         await update.message.reply_text(
-            "Something went wrong while generating the answer. Please try again."
+            "Something went wrong while reading the faculty document. Please try again."
         )
         return
 
@@ -355,12 +395,14 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     for chunk in chunks:
         await update.message.reply_text(chunk)
 
+
 def main():
     app = ApplicationBuilder().token(TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("limit", limit_cmd))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     app.run_polling()
+
 
 if __name__ == "__main__":
     main()
