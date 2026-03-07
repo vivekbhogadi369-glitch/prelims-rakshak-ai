@@ -15,7 +15,23 @@ from telegram.ext import (
 # ===================== ENV =====================
 TOKEN = os.getenv("TELEGRAM_TOKEN")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+# ===================== Faculty PDF =====================
 
+PDF_PATH = "docs/Class 6 History Our Pasts 1.pdf"
+
+def load_pdf_text():
+    try:
+        reader = PdfReader(PDF_PATH)
+        text = ""
+        for page in reader.pages:
+            page_text = page.extract_text()
+            if page_text:
+                text += page_text + "\n"
+        return text
+    except Exception:
+        return ""
+
+PDF_TEXT = load_pdf_text()
 if not TOKEN:
     raise ValueError("Missing TELEGRAM_TOKEN")
 
