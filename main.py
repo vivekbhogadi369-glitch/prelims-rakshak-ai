@@ -267,28 +267,21 @@ Answer not found in the uploaded faculty document.
 def generate_ai_answer(topic: str, subject: str, telugu: bool, context_text: str) -> str:
     prompt = build_prompt(topic, subject, telugu, context_text)
 
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {
-                "role": "system",
-                "content": (
-                    "You must answer strictly from the provided document excerpts only. "
-                    "Never use outside knowledge. "
-                    "If the excerpts are insufficient, say exactly: "
-                    "'Answer not found in the uploaded faculty document.'"
-                ),
-            },
-            {
-                "role": "user",
-                "content": prompt,
-            },
-        ],
-        temperature=0.2,
-        max_tokens=1400,
-    )
+    response = client.responses.create(
+    model="gpt-4.1-mini",
+    input=prompt,
+    tools=[
+        {
+            "type": "file_search",
+            "vector_store_ids": [VECTOR_STORE_ID]
+        }
+    ],
+    temperature=0.2,
+    max_output_tokens=1400
+)
+            
 
-    return response.choices[0].message.content.strip()
+    return response.output_text.strip()
 
 
 def split_long_message(text: str, limit: int = 3500):
@@ -311,8 +304,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "Current mode: Mentor output from uploaded faculty document only.\n\n"
         "Send your topic in this format:\n"
         "<Topic> from <Subject>\n\n"
-        "Example:\n"
-        "Earliest cities from history\n\n"
+        "Exarom history\n\n"
         "Default language: English\n"
         "Telugu only if asked."
     )
