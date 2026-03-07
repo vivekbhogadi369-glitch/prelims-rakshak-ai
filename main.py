@@ -1,7 +1,6 @@
 import os
 import re
 from datetime import date
-from PyPDF2 import PdfReader
 from openai import OpenAI
 from telegram import Update
 from telegram.ext import (
@@ -15,6 +14,7 @@ from telegram.ext import (
 # ===================== ENV =====================
 TOKEN = os.getenv("TELEGRAM_TOKEN")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+VECTOR_STORE_ID = os.getenv("VECTOR_STORE_ID")
 
 if not TOKEN:
     raise ValueError("Missing TELEGRAM_TOKEN")
@@ -22,36 +22,10 @@ if not TOKEN:
 if not OPENAI_API_KEY:
     raise ValueError("Missing OPENAI_API_KEY")
 
+if not VECTOR_STORE_ID:
+    raise ValueError("Missing VECTOR_STORE_ID")
+
 client = OpenAI(api_key=OPENAI_API_KEY)
-
-# ===================== Faculty PDFs =====================
-def load_all_pdfs():
-    text = ""
-    docs_folder = "docs"
-
-    if not os.path.exists(docs_folder):
-        return ""
-
-    for file in os.listdir(docs_folder):
-        if file.lower().endswith(".pdf"):
-            path = os.path.join(docs_folder, file)
-
-            try:
-                reader = PdfReader(path)
-
-                for page in reader.pages:
-                    page_text = page.extract_text()
-
-                    if page_text:
-                        text += page_text + "\n"
-
-            except Exception:
-                continue
-
-    return text.strip()
-
-
-PDF_TEXT = load_all_pdfs()
 
 # ===================== Daily Limit =====================
 DAILY_LIMIT = int(os.getenv("DAILY_LIMIT", "10"))
@@ -172,75 +146,50 @@ def is_allowed_subject(subject: str) -> bool:
     return s in [normalize_subject(x) for x in ALLOWED_SUBJECTS]
 
 
-def keyword_list(text: str) -> list[str]:
-    words = re.findall(r"[a-zA-Z]{3,}", text.lower())
-    stop = {
-        "the", "and", "from", "with", "into", "about", "paper", "prelims",
-        "topic", "subject", "history", "polity", "economy", "geography",
-        "science", "technology", "environment", "disaster", "management",
-        "indian", "india"
-    }
-    out = []
-    seen = set()
-    for w in words:
-        if w not in stop and w not in seen:
-            seen.add(w)
-            out.append(w)
-    return out[:10]
+# ===================== Vector Store Retrieval =====================
+def get_relevant_context(topic: str, subject: str, max_results: int = 5) -> str:
+    """
+    Searches the OpenAI vector store and returns joined text chunks.
+    """
+    query = f"{topic} {subject}".strip()
 
-
-# ===================== Simple document retrieval =====================
-def split_text_into_chunks(text: str, chunk_size: int = 1800):
-    if not text:
-        return []
-
-    cleaned = re.sub(r"\s+", " ", text).strip()
-    chunks = []
-    start = 0
-    n = len(cleaned)
-
-    while start < n:
-        end = min(start + chunk_size, n)
-        chunk = cleaned[start:end]
-
-        if end < n:
-            last_period = chunk.rfind(". ")
-            last_space = chunk.rfind(" ")
-            if last_period > 800:
-                end = start + last_period + 1
-                chunk = cleaned[start:end]
-            elif last_space > 1200:
-                end = start + last_space
-                chunk = cleaned[start:end]
-
-        chunks.append(chunk.strip())
-        start = end
-
-    return chunks
-
-
-DOC_CHUNKS = split_text_into_chunks(PDF_TEXT)
-
-
-def get_relevant_context(topic: str, subject: str, max_chunks: int = 4) -> str:
-    if not DOC_CHUNKS:
+    try:
+        page = client.vector_stores.search(
+            vector_store_id=VECTOR_STORE_ID,
+            query=query,
+            max_num_results=max_results,
+        )
+    except Exception:
         return ""
 
-    keys = keyword_list(topic + " " + subject)
-    if not keys:
+    results = getattr(page, "data", None) or []
+    if not results:
         return ""
 
-    scored = []
-    for chunk in DOC_CHUNKS:
-        chunk_lower = chunk.lower()
-        score = sum(1 for k in keys if k in chunk_lower)
-        if score > 0:
-            scored.append((score, chunk))
+    collected = []
 
-    scored.sort(key=lambda x: x[0], reverse=True)
-    top_chunks = [chunk for _, chunk in scored[:max_chunks]]
+    for result in results:
+        filename = getattr(result, "filename", "Unknown file")
+        score = getattr(result, "score", None)
+        content_items = getattr(result, "content", None) or []
 
-    return "\n\n".join(top_chunks).strip()
+        text_bits = []
+        for item in content_items:
+            item_type = getattr(item, "type", None)
+            item_text = getattr(item, "text", None)
+            if item_type == "text" and item_text:
+                text_bits.append(item_text.strip())
+
+        joined_text = "\n".join(x for x in text_bits if x).strip()
+        if not joined_text:
+            continue
+
+        if score is None:
+            collected.append(f"[Source: {filename}]\n{joined_text}")
+        else:
+            collected.append(f"[Source: {filename} | Score: {score:.2f}]\n{joined_text}")
+
+    return "\n\n".join(collected).strip()
 
 
 # ===================== AI Generation =====================
@@ -407,12 +356,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-    if not PDF_TEXT:
-        await update.message.reply_text(
-            "No readable faculty document found. Please upload a valid PDF."
-        )
-        return
-
     telugu = user_requested_telugu(text)
     context_text = get_relevant_context(topic, subject_normalized)
 
@@ -424,7 +367,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     inc_today(user_id)
 
-    await update.message.reply_text("Searching faculty document and preparing mentor answer...")
+    await update.message.reply_text("Searching vector store and preparing mentor answer...")
 
     try:
         final = generate_ai_answer(topic, subject_normalized, telugu, context_text)
