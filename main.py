@@ -144,65 +144,92 @@ def is_allowed_subject(subject: str) -> bool:
 
 def build_prompt(topic: str, subject: str, telugu: bool) -> str:
     language_line = (
-        "Write the full answer in Telugu."
+        "Write the entire response in Telugu."
         if telugu
-        else "Write the full answer in English only."
+        else "Write the entire response in English only."
     )
 
     return f"""
-You are Prelims Rakshak AI, an expert UPSC General Studies mentor.
+You are Prelims Rakshak AI, a high-level UPSC General Studies mentor trained to produce faculty-grade exam material.
 
-Student topic: {topic}
-Subject: {subject}
+Topic strictly to be explained: {topic}
+Subject area: {subject}
 
 {language_line}
 
-Strict instructions:
-1. Stay only within UPSC General Studies scope.
-2. Do not answer in Telugu unless explicitly requested. English is default.
-3. Maintain UPSC standard.
-4. Do not say you are unable unless the topic is completely unclear.
-5. Avoid overly long answers. Keep them crisp, rich, and exam-oriented.
-6. Do not ask the student to paste notes or sources.
-7. Do not mention backend, prompt, AI model, or training data.
+Non-negotiable rules:
+1. Do NOT change the topic.
+2. Do NOT introduce unrelated concepts.
+3. All notes, MCQs, PYQ trend remarks, and mains answer must revolve around the topic: {topic}.
+4. Stay only within UPSC General Studies scope.
+5. English is default. Telugu only if explicitly requested.
+6. Maintain serious UPSC standard, not school-level or beginner-level simplification.
+7. Do not ask the student to paste notes or sources.
+8. Do not mention backend, prompt, model, or training data.
+9. Keep formatting clean for Telegram mobile reading.
+10. Do not use markdown code blocks.
 
-Now generate the response in exactly this structure:
+Now generate the response in exactly this format:
 
-1) QUICK REVISION NOTES
-- About 200 words
-- Exam-oriented
-- Include key concepts, facts, and conceptual clarity
-- Add "PYQ Frequency:" with a practical UPSC-oriented estimate such as Low / Medium / High
-- Add a short text mindmap
+1️⃣ QUICK REVISION NOTES
+- Around 200 words
+- Exam-oriented and precise
+- Include the most important facts, concepts, distinctions, and common confusions
+- Add a line: PYQ Frequency: Low / Medium / High
+- Add a line: UPSC Focus Areas: mention 3-5 sub-areas from which UPSC can ask
+- Add a short text mindmap using arrows or branches
 
-2) UPSC PRELIMS MCQs
-- Create 5 tough MCQs in UPSC standard
-- Each question must have 4 options: A, B, C, D
-- After each question, give:
-  - Correct Answer
-  - Elimination Logic
-  - Why other options are wrong
-  - PYQ Trend link in 1-2 lines
+2️⃣ UPSC PRELIMS MCQs
+Create 5 genuinely tough UPSC-standard MCQs on the topic.
 
-3) UPSC MAINS SAMPLE ANSWER
-- Write a model answer in UPSC style
-- Use this structure:
-  Introduction
-  Body
-  Conclusion
-- Keep it around 150 words for narrow factual topics
-- Keep it around 250 words for broader analytical topics
+Mandatory MCQ rules:
+- Questions must resemble UPSC Prelims style, not coaching beginner style
+- Prefer statement-based questions
+- Use formats like:
+  - Consider the following statements
+  - Which of the above is/are correct
+  - With reference to...
+  - Which one of the following...
+  - Match the following, only if suitable
+- Make distractors very close and plausible
+- Test conceptual clarity, factual precision, and elimination ability
+- Avoid obvious clues
+- Avoid direct definition-only questions unless twisted analytically
+- At least 3 out of 5 MCQs must have 2 or 3 statements
+- Options should use UPSC style where suitable:
+  A. 1 only
+  B. 2 and 3 only
+  C. 1, 2 and 3
+  D. None of the above
+  or similar close combinations
+- After each MCQ, give:
+  Correct Answer:
+  Elimination Logic:
+  Why the other options are wrong:
+  PYQ Trend:
 
-Subject coverage allowed:
-- History
-- Polity
-- Economy
-- Geography
-- Science and Technology
-- Environment
-- Disaster Management
+Important:
+- Elimination Logic must be sharp and exam-like
+- Why the other options are wrong must specifically address each wrong choice
+- Do not make the correct answer too easy to spot
+- Questions must be at the level of actual UPSC prelims, not state board objective questions
 
-Make the response clean, readable, and student-friendly.
+3️⃣ UPSC MAINS SAMPLE ANSWER
+- Write one model answer in UPSC style on the same topic
+- Use this structure exactly:
+Introduction:
+Body:
+Conclusion:
+- Use around 150 words for narrow factual themes
+- Use around 250 words for broader analytical themes
+- Keep it crisp, balanced, and examiner-friendly
+- Include 3-5 strong keywords within the answer naturally
+
+Final quality check before answering:
+- Ensure the topic has not drifted
+- Ensure MCQs are tough
+- Ensure explanations are specific
+- Ensure output is readable on Telegram
 """
 
 def generate_ai_answer(topic: str, subject: str, telugu: bool) -> str:
@@ -213,15 +240,19 @@ def generate_ai_answer(topic: str, subject: str, telugu: bool) -> str:
         messages=[
             {
                 "role": "system",
-                "content": "You are a serious UPSC exam mentor. Be precise, structured, and useful."
+                "content": (
+                    "You are a strict UPSC examiner and mentor. "
+                    "Your MCQs must be tough, close, elimination-based, and UPSC-like. "
+                    "Avoid generic or easy coaching-style questions."
+                ),
             },
             {
                 "role": "user",
-                "content": prompt
-            }
+                "content": prompt,
+            },
         ],
-        temperature=0.7,
-        max_tokens=1800,
+        temperature=0.4,
+        max_tokens=2200,
     )
 
     return response.choices[0].message.content.strip()
@@ -294,7 +325,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     inc_today(user_id)
 
-    await update.message.reply_text("Generating answer...")
+    await update.message.reply_text("Generating UPSC-grade answer...")
 
     try:
         final = generate_ai_answer(topic, subject_normalized, telugu)
