@@ -275,9 +275,17 @@ PYQ Frequency: Low / Medium / High
 Mindmap: in short text form
 
 2️⃣ UPSC PRELIMS MCQs
-- Create 3 MCQs only
+- Create 3 genuinely UPSC-standard MCQs only
 - They must be based only on the excerpt
-- Prefer statement-based format where possible
+- At least 2 out of 3 must be statement-based
+- Use UPSC-style formats such as:
+  • Consider the following statements
+  • With reference to...
+  • Which of the statements given above is/are correct?
+- Avoid direct one-line factual questions unless absolutely unavoidable
+- Make options close and confusing, suitable for elimination
+- Include conceptual traps wherever possible, but only from the excerpt
+- Do not ask very easy questions like dates or names directly unless mixed with other statements
 - After each MCQ give:
 Correct Answer:
 Elimination Logic:
