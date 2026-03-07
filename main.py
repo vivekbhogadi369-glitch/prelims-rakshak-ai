@@ -99,12 +99,6 @@ ALLOWED_SUBJECTS = [
 
 # ===================== Input parsing =====================
 def parse_topic_subject(text: str):
-    """
-    Expected:
-    <Topic> from <Subject>
-    Example:
-    Indus town planning from history
-    """
     if not text:
         return None, None
 
@@ -242,34 +236,64 @@ def get_relevant_context(topic: str, subject: str, max_chunks: int = 4) -> str:
 # ===================== AI Generation =====================
 def build_prompt(topic: str, subject: str, telugu: bool, context_text: str) -> str:
     language_line = (
-        "Write the entire response in Telugu."
+        "Write the full response in Telugu."
         if telugu
-        else "Write the entire response in English only."
+        else "Write the full response in English only."
     )
 
     return f"""
-You are Prelims Rakshak AI.
+You are Prelims Rakshak AI, a UPSC mentor.
 
 Student topic: {topic}
 Subject: {subject}
 
-Relevant faculty document excerpts:
+Faculty document excerpts:
 {context_text}
 
 {language_line}
 
 Strict rules:
-1. Answer ONLY from the faculty document excerpts given above.
+1. Use ONLY the faculty document excerpts given above.
 2. Do NOT use outside knowledge.
 3. Do NOT guess, assume, or add facts not present in the excerpts.
-4. If the excerpts are insufficient, reply exactly:
+4. If the excerpts are not enough, reply exactly:
 Answer not found in the uploaded faculty document.
-5. Keep the answer short, clear, and exam-oriented.
-6. Do not mention AI, prompt, model, backend, training data, or document retrieval.
-7. Do not generate MCQs, mains answers, PYQ frequency, or mindmaps unless clearly supported by the excerpt.
-8. Do not change the topic.
+5. Do not mention AI, prompt, model, backend, training data, or retrieval.
+6. Keep the topic strictly limited to: {topic}
+7. Generate exam-oriented content only if supported by the excerpts.
+8. If exact PYQ frequency is not available in the excerpt, give only a cautious estimate such as Low / Medium / High based on the excerpted importance, without claiming official data.
+9. MCQs and mains answer must be based only on the given excerpts.
 
-Now answer the student's topic using only the faculty document excerpts.
+Now generate the response in this format:
+
+1️⃣ QUICK REVISION NOTES
+- Around 120 to 180 words
+- Crisp, exam-oriented
+- Only from the excerpt
+- Add:
+PYQ Frequency: Low / Medium / High
+Mindmap: in short text form
+
+2️⃣ UPSC PRELIMS MCQs
+- Create 3 MCQs only
+- They must be based only on the excerpt
+- Prefer statement-based format where possible
+- After each MCQ give:
+Correct Answer:
+Elimination Logic:
+Why other options are wrong:
+
+3️⃣ UPSC MAINS SAMPLE ANSWER
+- One short mains answer
+- Structure:
+Introduction:
+Body:
+Conclusion:
+- Keep it around 120 to 150 words
+- Only from the excerpt
+
+If the excerpt is too thin for all 3 sections, reply exactly:
+Answer not found in the uploaded faculty document.
 """
 
 
@@ -282,8 +306,9 @@ def generate_ai_answer(topic: str, subject: str, telugu: bool, context_text: str
             {
                 "role": "system",
                 "content": (
-                    "You must answer strictly from provided document excerpts only. "
-                    "If the answer is not supported by the excerpts, say exactly: "
+                    "You must answer strictly from the provided document excerpts only. "
+                    "Never use outside knowledge. "
+                    "If the excerpts are insufficient, say exactly: "
                     "'Answer not found in the uploaded faculty document.'"
                 ),
             },
@@ -292,8 +317,8 @@ def generate_ai_answer(topic: str, subject: str, telugu: bool, context_text: str
                 "content": prompt,
             },
         ],
-        temperature=0.1,
-        max_tokens=700,
+        temperature=0.2,
+        max_tokens=1400,
     )
 
     return response.choices[0].message.content.strip()
@@ -316,11 +341,11 @@ def split_long_message(text: str, limit: int = 3500):
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = (
         "Hello 👋 Prelims Rakshak AI is live.\n\n"
-        "Current mode: Answering from uploaded faculty document only.\n\n"
+        "Current mode: Mentor output from uploaded faculty document only.\n\n"
         "Send your topic in this format:\n"
         "<Topic> from <Subject>\n\n"
         "Example:\n"
-        "Harappan civilization from history\n\n"
+        "Earliest cities from history\n\n"
         "Default language: English\n"
         "Telugu only if asked."
     )
@@ -352,7 +377,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "Please use this format:\n"
             "<Topic> from <Subject>\n\n"
             "Example:\n"
-            "Harappan civilization from history"
+            "Earliest cities from history"
         )
         return
 
@@ -381,7 +406,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     inc_today(user_id)
 
-    await update.message.reply_text("Searching faculty document...")
+    await update.message.reply_text("Searching faculty document and preparing mentor answer...")
 
     try:
         final = generate_ai_answer(topic, subject_normalized, telugu, context_text)
