@@ -47,7 +47,7 @@ No PYQs came from this subtopic so far.
             max_output_tokens=1200
         )
 
-        answer = response.output_text if getattr(response, "output_text", None) else "Error: Empty response from OpenAI."
+        answer = response.output[0].content[0].text
 
     except Exception as e:
         answer = "Error: " + str(e) + "\n\n" + traceback.format_exc()
