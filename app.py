@@ -1,10 +1,14 @@
 from flask import Flask, request, jsonify, render_template
 from openai import OpenAI
 import os
+import traceback
 
 app = Flask(__name__)
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"), timeout=120)
+client = OpenAI(
+    api_key=os.getenv("OPENAI_API_KEY"),
+    timeout=120
+)
 
 @app.route("/")
 def home():
@@ -12,11 +16,14 @@ def home():
 
 @app.route("/ask", methods=["POST"])
 def ask():
+    try:
+        data = request.get_json(silent=True) or {}
+        user_message = data.get("message", "").strip()
 
-    data = request.get_json()
-    user_message = data.get("message", "")
+        if not user_message:
+            return jsonify({"answer": "Error: Please enter topic, subject."})
 
-    prompt = f"""
+        prompt = f"""
 You are Prelims Rakshak AI created by Vivek Sir for UPSC aspirants.
 
 Student question:
@@ -30,25 +37,22 @@ B. QUICK REVISION NOTES (500 words with timeline, mindmap and map pointers)
 
 C. PRACTICE MCQs (10 UPSC standard MCQs with elimination explanation and trap zones)
 
-If PYQs are not available say:
-"No PYQs came from this subtopic so far."
+If PYQs are not available say exactly:
+No PYQs came from this subtopic so far.
 """
 
-    try:
         response = client.responses.create(
             model="gpt-5-mini",
-            input=prompt
+            input=prompt,
+            max_output_tokens=1200
         )
-        answer = response.output_text
+
+        answer = response.output_text if getattr(response, "output_text", None) else "Error: Empty response from OpenAI."
+
     except Exception as e:
-        # Show error details in answer for debugging
-        import traceback
         answer = "Error: " + str(e) + "\n\n" + traceback.format_exc()
 
-    return jsonify({
-        "answer": answer
-    })
+    return jsonify({"answer": answer})
 
 if __name__ == "__main__":
-    
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
