@@ -74,7 +74,8 @@ For each MCQ include:
             tools=[
                 {
                     "type": "file_search",
-                    "vector_store_ids": [VECTOR_STORE_ID]
+                    "vector_store_ids": [VECTOR_STORE_ID],
+                    "max_num_results": 10
                 }
             ]
         )
