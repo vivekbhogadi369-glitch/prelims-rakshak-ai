@@ -29,6 +29,9 @@ Answer strictly in the following structure:
 
 A. UPSC PRELIMS PYQs (Past 15 years)
 - List all relevant PYQs from the past 15 years related to the topic.
+- For every PYQ, mention the year first in this style:
+  2019 - UPSC Prelims
+- Then write the question and answer.
 - If none exist, write exactly:
 No PYQs came from this subtopic so far.
 
