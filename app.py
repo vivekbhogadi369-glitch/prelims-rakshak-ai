@@ -73,7 +73,17 @@ For each MCQ include:
             ]
         )
 
-        answer = response.output[0].content[0].text
+        answer = "Error: No answer generated."
+
+        for item in response.output:
+            if getattr(item, "type", "") == "message":
+                contents = getattr(item, "content", [])
+                for content in contents:
+                    if getattr(content, "type", "") in ["output_text", "text"]:
+                        answer = getattr(content, "text", "Error: No answer generated.")
+                        break
+                if answer != "Error: No answer generated.":
+                    break
 
         return jsonify({"answer": answer})
 
