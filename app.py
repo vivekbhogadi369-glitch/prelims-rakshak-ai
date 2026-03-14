@@ -65,42 +65,31 @@ B. QUICK REVISION NOTES (UPSC Coaching Style - Minimum 700 words)
 
 Make this section look like UPSC classroom revision notes.
 
-Structure STRICTLY like this:
+Use this structure internally while writing, but DO NOT print labels like:
+"1. Topic Title"
+"2. Brief Introduction"
+"3. Core Concepts"
 
-1. Topic Title
+Instead directly use natural coaching-note headings such as:
+Introduction
+Urban Layout
+Administrative Structure
+Important Sites
+Chronology
+UPSC Trap Zone
+Revision Takeaway
 
-2. Brief Introduction (2-3 lines)
-
-3. Core Concepts
-- Use short crisp bullet points
-- Avoid long paragraphs
-
-4. Key Facts Table
-- Compulsory: include one small table wherever possible
-
-5. Chronology Block
-- Give a short timeline wherever relevant
-
-6. Structural Flow / Administrative Diagram
-- Give one neat text flowchart or hierarchy wherever possible
-
-7. Important Sites / Geographic References
-- Mention important locations, sites, capitals, rivers, regions wherever relevant
-
-8. UPSC Trap Zone
-- Mention common exam confusions clearly
-
-9. One-Line Revision Takeaway
-
-Formatting Rules:
-- Prefer bullet points
-- Avoid long paragraphs
-- Use clean headings
-- Use one small table
-- Use one flowchart in plain text
-- Make it look like coaching revision sheets, not generic AI notes
-- Do NOT divide the notes into two separate explanatory parts
-- Write it as one continuous structured revision sheet
+Formatting rules for Quick Revision Notes:
+- Prefer short, crisp bullet points.
+- Avoid long paragraphs.
+- Use clean natural headings.
+- Include one small table wherever useful.
+- Include one short chronology block wherever relevant.
+- Include one plain-text flowchart or hierarchy wherever useful.
+- Mention important sites, rivers, capitals, regions, or geographic references wherever relevant.
+- Include one UPSC Trap Zone.
+- Include one one-line revision takeaway.
+- Make it look like a polished coaching handout, not generic AI notes.
 
 C. PRACTICE MCQs
 
