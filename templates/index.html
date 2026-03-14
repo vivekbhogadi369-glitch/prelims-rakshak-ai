@@ -51,6 +51,11 @@
             line-height: 1.6;
             font-size: 16px;
         }
+        #answer h3 {
+            color: #1d3557;
+            margin-top: 18px;
+            margin-bottom: 8px;
+        }
     </style>
 </head>
 <body>
@@ -92,7 +97,11 @@
             });
 
             const data = await response.json();
-            answerBox.innerText = data.answer;
+
+            answerBox.innerHTML = data.answer
+                .replace("A. UPSC PRELIMS PYQs", "<h3>A. UPSC PRELIMS PYQs</h3>")
+                .replace("B. QUICK REVISION NOTES", "<h3>B. QUICK REVISION NOTES</h3>")
+                .replace("C. PRACTICE MCQs", "<h3>C. PRACTICE MCQs</h3>");
 
             askButton.disabled = false;
             askButton.innerText = "Ask";
