@@ -37,25 +37,62 @@ A. UPSC PRELIMS PYQs (Past 15 years)
 No PYQs came from this subtopic so far.
 
 B. QUICK REVISION NOTES (Minimum 500 words)
-Include:
-- Key concepts
-- Timeline if applicable
-- Map/location references if relevant
-- Mindmap-style bullet structure
+
+The notes must look like high-quality UPSC coaching material.
+
+Include the following:
+
+1. **Core Concept Explanation**
+   - Explain the topic clearly and concisely.
+
+2. **Chronology / Timeline**
+   - If the topic has historical development, provide timeline points.
+
+3. **Key Terms / Exam Keywords**
+   - Highlight terms UPSC frequently tests.
+
+4. **UPSC Trap Areas**
+   - Mention common conceptual confusions asked in exams.
+
+5. **Mini Mindmap Structure**
+   Example format:
+   Topic
+   ├ Key feature 1
+   ├ Key feature 2
+   ├ Related concept
+   └ Important fact
+
+6. **Map or Location references**
+   - Mention geographical locations if relevant.
 
 C. PRACTICE MCQs
-Generate 10 UPSC standard MCQs.
 
-For each MCQ include:
-- Correct answer
-- Elimination logic
-- Why other options are wrong
-- Trap zone where aspirants usually get confused
+Generate **10 UPSC standard MCQs**.
+
+Each MCQ must follow this format:
+
+Question
+
+A. Option  
+B. Option  
+C. Option  
+D. Option  
+
+Correct Answer
+
+Elimination Logic  
+- Explain how a student can eliminate wrong options step-by-step.
+
+Why Other Options Are Wrong  
+- Brief explanation for each incorrect option.
+
+Trap Zone  
+- Mention where UPSC usually confuses aspirants.
 
 Rules:
 - Default language: English
 - Do not ask the student to paste anything
-- Keep the output clean, exam-oriented, and structured
+- Keep the output structured and exam-oriented
 """
 
         response = client.responses.create(
