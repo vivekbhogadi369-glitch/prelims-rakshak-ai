@@ -69,6 +69,9 @@
             padding: 14px;
             white-space: pre-wrap;
         }
+        .section-content b {
+            color: #1d3557;
+        }
         .plain-answer {
             white-space: pre-wrap;
             background: #ffffff;
@@ -106,6 +109,12 @@
                 .replace(/>/g, "&gt;");
         }
 
+        function formatPyqText(text) {
+            let safeText = escapeHtml(text);
+            safeText = safeText.replace(/(20\d{2}\s*-\s*UPSC Prelims)/g, "<b>$1</b>");
+            return safeText;
+        }
+
         function buildSections(answer) {
             const pyqHeading = "A. UPSC PRELIMS PYQs";
             const notesHeading = "B. QUICK REVISION NOTES";
@@ -126,7 +135,7 @@
             return `
                 <details class="section" open>
                     <summary>▼ PYQs</summary>
-                    <div class="section-content">${escapeHtml(pyqText)}</div>
+                    <div class="section-content">${formatPyqText(pyqText)}</div>
                 </details>
 
                 <details class="section">
