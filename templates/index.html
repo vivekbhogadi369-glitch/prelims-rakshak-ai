@@ -45,6 +45,9 @@
             background: #1d3557;
             color: white;
         }
+        .secondary-button {
+            background: #6c757d;
+        }
         #answer {
             margin-top: 20px;
             line-height: 1.6;
@@ -97,6 +100,7 @@
         <textarea id="question" placeholder="Example: Indus Town Planning, Indian History"></textarea>
 
         <button id="askButton" onclick="askAI()">Ask</button>
+        <button class="secondary-button" onclick="resetAI()">Reset</button>
 
         <div id="answer">Your answer will appear here.</div>
     </div>
@@ -148,6 +152,13 @@
                     <div class="section-content">${escapeHtml(mcqText)}</div>
                 </details>
             `;
+        }
+
+        function resetAI() {
+            document.getElementById("question").value = "";
+            document.getElementById("answer").innerText = "Your answer will appear here.";
+            document.getElementById("askButton").disabled = false;
+            document.getElementById("askButton").innerText = "Ask";
         }
 
         async function askAI() {
