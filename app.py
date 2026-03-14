@@ -6,6 +6,8 @@ app = Flask(__name__)
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
+VECTOR_STORE_ID = os.getenv("VECTOR_STORE_ID")
+
 @app.route("/")
 def home():
     return render_template("index.html")
@@ -22,110 +24,53 @@ def ask():
         prompt = f"""
 You are Prelims Rakshak AI created by Vivek Sir for UPSC aspirants.
 
+The answers MUST come from the faculty uploaded history documents.
+
 Student query:
 {user_message}
 
-Answer strictly in the following structure:
-
---------------------------------------------------
+Answer strictly in this structure:
 
 A. UPSC PRELIMS PYQs (Past 15 years)
 
-- List all relevant PYQs from the past 15 years related to the topic.
-- If exact PYQs are not available, include PYQs from closely related subtopics.
-- For every PYQ mention the year like:
-
-2019 - UPSC Prelims
-
-- Then write the question and answer.
-
-If none exist write exactly:
-No PYQs came from this subtopic so far.
-
---------------------------------------------------
-
-B. QUICK REVISION NOTES (Minimum 500 words)
-
-The notes must look like high quality UPSC coaching material.
-
+B. QUICK REVISION NOTES (minimum 500 words)
 Include:
-
-1. Core Concept Explanation
-2. Chronology / Timeline if relevant
-3. Key Terms / Exam Keywords
-4. UPSC Trap Areas
-5. Mini Mindmap structure
-6. Map or location references if relevant
-
---------------------------------------------------
+- concept explanation
+- timeline
+- key exam terms
+- UPSC trap areas
+- mini mindmap structure
 
 C. PRACTICE MCQs
 
-Generate exactly **10 UPSC standard MCQs**.
+Generate exactly 10 UPSC standard MCQs:
 
-MCQ Pattern Distribution:
+Pattern:
+5 Statement based
+3 Match the following
+2 Factual
 
-• 5 Statement based questions  
-• 3 Match the Following questions  
-• 2 Factual questions  
+Difficulty:
+3 Easy
+5 Moderate
+2 Tough
 
-Difficulty Distribution:
-
-• 3 Easy questions  
-• 5 Moderately difficult questions  
-• 2 Tough questions  
-
-Follow real UPSC style.
-
-Statement based example format:
-
-Consider the following statements:
-
-1. Statement  
-2. Statement  
-3. Statement  
-
-Which of the above is/are correct?
-
-(a) 1 only  
-(b) 1 and 2 only  
-(c) 2 and 3 only  
-(d) 1, 2 and 3  
-
-Match the following example format:
-
-Match List I with List II.
-
-List I | List II
-
-Choose the correct answer using codes below.
-
-Factual questions should test precise knowledge.
-
-For EACH MCQ include:
-
-Correct Answer
-
-Elimination Logic  
-Explain how aspirants can eliminate options.
-
-Why Other Options Are Wrong
-
-Trap Zone  
-Mention typical UPSC confusion area.
-
---------------------------------------------------
-
-Rules:
-
-Default language: English  
-Do not ask students to paste anything  
-Keep the output clean, exam-oriented and structured
+For each MCQ include:
+- Correct answer
+- Elimination logic
+- Why other options are wrong
+- Trap zone
 """
 
         response = client.responses.create(
             model="gpt-4.1-mini",
-            input=prompt
+            input=prompt,
+            tools=[
+                {
+                    "type": "file_search",
+                    "vector_store_ids": [VECTOR_STORE_ID]
+                }
+            ]
         )
 
         answer = response.output[0].content[0].text
