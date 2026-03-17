@@ -61,18 +61,23 @@ A. UPSC PRELIMS PYQs (Past 15 years)
 - If none exist, write exactly:
 No PYQs came from this subtopic so far.
 
-B. QUICK REVISION NOTES (UPSC Coaching Style - Minimum 700 words)
+B. QUICK REVISION NOTES
 
-Make this section look like UPSC classroom revision notes.
+At the beginning of this section, write exactly:
+Here are your quick revision notes on {user_message} for your exam.
 
-Use this structure internally while writing, but DO NOT print labels like:
-"1. Topic Title"
-"2. Brief Introduction"
-"3. Core Concepts"
+At the end of this section, write exactly:
+Best wishes for your preparation.
 
-Instead directly use natural coaching-note headings such as:
+Important:
+- Do NOT write phrases like "UPSC Coaching Style", "Quick Revision Notes (UPSC Coaching Style)", or any bracketed heading.
+- Do NOT show template labels or meta-headings.
+- Do NOT show numbering like "1. Topic Title" or "2. Brief Introduction".
+
+Use natural, attractive headings such as:
 Introduction
-Urban Layout
+Background
+Core Features
 Administrative Structure
 Important Sites
 Chronology
@@ -80,16 +85,18 @@ UPSC Trap Zone
 Revision Takeaway
 
 Formatting rules for Quick Revision Notes:
-- Prefer short, crisp bullet points.
-- Avoid long paragraphs.
-- Use clean natural headings.
-- Include one small table wherever useful.
-- Include one short chronology block wherever relevant.
-- Include one plain-text flowchart or hierarchy wherever useful.
-- Mention important sites, rivers, capitals, regions, or geographic references wherever relevant.
-- Include one UPSC Trap Zone.
-- Include one one-line revision takeaway.
-- Make it look like a polished coaching handout, not generic AI notes.
+- Minimum around 700 words
+- Prefer short, crisp bullet points
+- Avoid long dull paragraphs
+- Use clean headings
+- Include one small table wherever useful
+- Include one short chronology block wherever relevant
+- Include one plain-text flowchart or hierarchy wherever useful
+- Mention important sites, rivers, capitals, regions, or geographic references wherever relevant
+- Include one UPSC Trap Zone
+- Include one one-line revision takeaway
+- Make it look like polished coaching notes, not AI output
+- Make it visually organized and revision-friendly
 
 C. PRACTICE MCQs
 
@@ -105,56 +112,25 @@ STRICT DIFFICULTY:
 - 5 moderate
 - 2 tough
 
-ADVANCED UPSC RULES (CRITICAL):
+ADVANCED UPSC RULES:
 1. Questions must resemble real UPSC PYQs.
-2. Avoid direct/static questions. Every question must involve thinking or elimination.
-3. Use multi-dimensional framing:
-   - Chronology
-   - Location (map-based)
-   - Administration
-   - Economy
-   - Culture
-   - Terminology
-4. At least 3 questions must be interlinked across topics.
-5. At least 2 questions must be tricky statement-based where 2 options look correct.
-6. Use negative statements occasionally:
-   - Which of the following is NOT correct?
+2. Avoid direct/static questions.
+3. Use chronology, location, administration, economy, culture, and terminology.
+4. At least 3 questions should interlink topics.
+5. At least 2 statement questions should have close/confusing options.
+6. Use negative statements occasionally.
 7. Include assertion-reason style in at least 1 question.
 8. Include chronology-based arrangement in at least 1 question.
 9. Include map/location logic in at least 1 question.
-10. Include at least 1 question based on NCERT hidden lines / small facts.
-
-STATEMENT QUESTIONS:
-- Use 2, 3 or 4 statements
-- Ensure at least one misleading or partially correct statement
-- Avoid obvious elimination
-
-MATCH THE FOLLOWING:
-- Use List I and List II properly
-- Use confusing but logical pairs
-
-FACTUAL QUESTIONS:
-- Must still be tricky
-- Options must be close, not obvious
-
-OPTION FORMAT (STRICT UPSC STYLE):
-(a) 1 only
-(b) 1 and 2 only
-(c) 2 and 3 only
-(d) 1, 2 and 3
-
-or proper match-the-following code format where needed.
+10. Include at least 1 question based on a small NCERT fact.
 
 FOR EACH MCQ GIVE:
 1. Question
 2. Options
 3. Correct Answer
-4. Elimination Logic (step-by-step UPSC style)
+4. Elimination Logic
 5. Why other options are wrong
 6. Trap Zone
-
-FINAL RULE:
-The MCQs must feel like they are taken from an actual UPSC Prelims paper, not school-level quiz material.
 """
 
         response = client.responses.create(
