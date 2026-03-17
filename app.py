@@ -93,23 +93,59 @@ Formatting rules for Quick Revision Notes:
 
 C. PRACTICE MCQs
 
-Generate exactly 10 UPSC standard MCQs.
+Generate exactly 10 UPSC Prelims standard MCQs.
 
-Pattern:
-- 5 Statement based questions
-- 3 Match the following questions
-- 2 Factual questions
+STRICT DISTRIBUTION:
+- 5 statement-based questions
+- 3 match-the-following questions
+- 2 factual but tricky questions
 
-Difficulty:
-- 3 Easy
-- 5 Moderate
-- 2 Tough
+STRICT DIFFICULTY:
+- 3 easy
+- 5 moderate
+- 2 tough
 
-For EACH MCQ include:
-- Correct Answer
-- Elimination Logic
-- Why other options are wrong
-- Trap Zone
+VERY IMPORTANT MCQ RULES:
+- Questions must look like real UPSC Prelims questions, not school-level quiz questions.
+- Avoid direct obvious questions such as:
+  "Who was the ruler?"
+  "What was the capital?"
+  "Who wrote this book?"
+- Avoid one-line fact-recall questions unless made tricky through options.
+- Use conceptual framing, statement combinations, pair matching, and close distractors.
+- Make options competitive and confusing in a UPSC way.
+- Use wording such as:
+  "Consider the following statements"
+  "With reference to..."
+  "Which of the following pairs is/are correctly matched?"
+  "Which of the statements given above is/are correct?"
+- Statement-based questions must have 2, 3, or 4 statements.
+- Match-the-following questions must use List I and List II with proper answer codes.
+- Factual questions must still be tricky, not obvious.
+- Base the MCQs primarily on the uploaded documents.
+- Questions should test understanding, distinction, chronology, location, administration, terminology, and traps.
+- Include at least some questions where more than one option appears plausible.
+- Do NOT make all answers obvious from a single famous fact.
+- Do NOT repeat the same idea across multiple questions.
+
+OPTION STYLE:
+Use UPSC-style options such as:
+(a) 1 only
+(b) 1 and 2 only
+(c) 2 and 3 only
+(d) 1, 2 and 3
+
+or proper match-the-following code format.
+
+FOR EACH MCQ GIVE:
+1. Question
+2. Options
+3. Correct Answer
+4. Elimination Logic
+5. Why other options are wrong
+6. Trap Zone
+
+The MCQ section must feel like a serious UPSC prelims test booklet.
 """
 
         response = client.responses.create(
