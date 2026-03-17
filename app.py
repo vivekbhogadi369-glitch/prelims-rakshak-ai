@@ -105,47 +105,56 @@ STRICT DIFFICULTY:
 - 5 moderate
 - 2 tough
 
-VERY IMPORTANT MCQ RULES:
-- Questions must look like real UPSC Prelims questions, not school-level quiz questions.
-- Avoid direct obvious questions such as:
-  "Who was the ruler?"
-  "What was the capital?"
-  "Who wrote this book?"
-- Avoid one-line fact-recall questions unless made tricky through options.
-- Use conceptual framing, statement combinations, pair matching, and close distractors.
-- Make options competitive and confusing in a UPSC way.
-- Use wording such as:
-  "Consider the following statements"
-  "With reference to..."
-  "Which of the following pairs is/are correctly matched?"
-  "Which of the statements given above is/are correct?"
-- Statement-based questions must have 2, 3, or 4 statements.
-- Match-the-following questions must use List I and List II with proper answer codes.
-- Factual questions must still be tricky, not obvious.
-- Base the MCQs primarily on the uploaded documents.
-- Questions should test understanding, distinction, chronology, location, administration, terminology, and traps.
-- Include at least some questions where more than one option appears plausible.
-- Do NOT make all answers obvious from a single famous fact.
-- Do NOT repeat the same idea across multiple questions.
+ADVANCED UPSC RULES (CRITICAL):
+1. Questions must resemble real UPSC PYQs.
+2. Avoid direct/static questions. Every question must involve thinking or elimination.
+3. Use multi-dimensional framing:
+   - Chronology
+   - Location (map-based)
+   - Administration
+   - Economy
+   - Culture
+   - Terminology
+4. At least 3 questions must be interlinked across topics.
+5. At least 2 questions must be tricky statement-based where 2 options look correct.
+6. Use negative statements occasionally:
+   - Which of the following is NOT correct?
+7. Include assertion-reason style in at least 1 question.
+8. Include chronology-based arrangement in at least 1 question.
+9. Include map/location logic in at least 1 question.
+10. Include at least 1 question based on NCERT hidden lines / small facts.
 
-OPTION STYLE:
-Use UPSC-style options such as:
+STATEMENT QUESTIONS:
+- Use 2, 3 or 4 statements
+- Ensure at least one misleading or partially correct statement
+- Avoid obvious elimination
+
+MATCH THE FOLLOWING:
+- Use List I and List II properly
+- Use confusing but logical pairs
+
+FACTUAL QUESTIONS:
+- Must still be tricky
+- Options must be close, not obvious
+
+OPTION FORMAT (STRICT UPSC STYLE):
 (a) 1 only
 (b) 1 and 2 only
 (c) 2 and 3 only
 (d) 1, 2 and 3
 
-or proper match-the-following code format.
+or proper match-the-following code format where needed.
 
 FOR EACH MCQ GIVE:
 1. Question
 2. Options
 3. Correct Answer
-4. Elimination Logic
+4. Elimination Logic (step-by-step UPSC style)
 5. Why other options are wrong
 6. Trap Zone
 
-The MCQ section must feel like a serious UPSC prelims test booklet.
+FINAL RULE:
+The MCQs must feel like they are taken from an actual UPSC Prelims paper, not school-level quiz material.
 """
 
         response = client.responses.create(
