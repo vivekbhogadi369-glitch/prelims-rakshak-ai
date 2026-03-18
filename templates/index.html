@@ -121,6 +121,58 @@
             color: #1d3557;
             margin-bottom: 12px;
         }
+
+        /* MCQ styling */
+        .mcq-question {
+            display: block;
+            font-weight: 900;
+            font-size: 19px;
+            color: #1d3557;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            text-decoration: underline;
+        }
+        .mcq-answer {
+            display: block;
+            font-weight: 900;
+            font-size: 17px;
+            color: #1d3557;
+            margin-top: 14px;
+            margin-bottom: 6px;
+            text-decoration: underline;
+            text-transform: uppercase;
+        }
+        .mcq-logic {
+            display: block;
+            font-weight: 900;
+            font-size: 17px;
+            color: #0b6e4f;
+            margin-top: 14px;
+            margin-bottom: 6px;
+            text-decoration: underline;
+            text-transform: uppercase;
+        }
+        .mcq-wrong {
+            display: block;
+            font-weight: 900;
+            font-size: 17px;
+            color: #9c6644;
+            margin-top: 14px;
+            margin-bottom: 6px;
+            text-decoration: underline;
+            text-transform: uppercase;
+        }
+        .mcq-trap {
+            display: block;
+            font-weight: 900;
+            font-size: 17px;
+            color: #c1121f;
+            margin-top: 14px;
+            margin-bottom: 6px;
+            text-decoration: underline;
+            text-transform: uppercase;
+        }
+
         .plain-answer {
             white-space: pre-wrap;
             background: #ffffff;
@@ -182,13 +234,11 @@ function formatNotesText(text) {
             continue;
         }
 
-        // First line as topic sentence/title block
         if (i === 0) {
             out.push(`<span class="topic">${line}</span>`);
             continue;
         }
 
-        // Convert **HEADING** style
         let md = line.match(/^\*\*(.+?)\*\*$/);
         if (md) {
             let title = md[1].trim();
@@ -202,7 +252,6 @@ function formatNotesText(text) {
             continue;
         }
 
-        // Convert plain headings without **
         if (/^UPSC Trap Zone\s*⚠?$/i.test(line)) {
             out.push(`<span class="trap">UPSC TRAP ZONE</span>`);
             continue;
@@ -222,6 +271,40 @@ function formatNotesText(text) {
     }
 
     return out.join("\n");
+}
+
+function formatMcqText(text) {
+    let safe = escapeHtml(text).replace(/\r/g, "");
+
+    // Style numbered question headings like:
+    // 1. Statement Based (Easy)
+    safe = safe.replace(
+        /(^|\n)(\d+\.\s+[^\n]+)/g,
+        '$1<span class="mcq-question">$2</span>'
+    );
+
+    // Style section labels
+    safe = safe.replace(
+        /(^|\n)Correct Answer\s*:/gi,
+        '$1<span class="mcq-answer">CORRECT ANSWER:</span>'
+    );
+
+    safe = safe.replace(
+        /(^|\n)Elimination Logic\s*:/gi,
+        '$1<span class="mcq-logic">ELIMINATION LOGIC:</span>'
+    );
+
+    safe = safe.replace(
+        /(^|\n)Why other options are wrong\s*:/gi,
+        '$1<span class="mcq-wrong">WHY OTHER OPTIONS ARE WRONG:</span>'
+    );
+
+    safe = safe.replace(
+        /(^|\n)Trap Zone\s*:/gi,
+        '$1<span class="mcq-trap">TRAP ZONE:</span>'
+    );
+
+    return safe;
 }
 
 function buildSections(answer) {
@@ -254,7 +337,7 @@ function buildSections(answer) {
 
 <details class="section">
 <summary>▼ Practice MCQs</summary>
-<div class="section-content">${escapeHtml(mcqText)}</div>
+<div class="section-content">${formatMcqText(mcqText)}</div>
 </details>
 `;
 }
