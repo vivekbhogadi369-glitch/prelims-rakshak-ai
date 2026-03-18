@@ -169,51 +169,59 @@ function formatPyqText(text) {
 }
 
 function formatNotesText(text) {
-    let safe = escapeHtml(text);
+    let safe = escapeHtml(text).replace(/\r/g, "");
 
-    // Remove markdown stars and normalize line endings
-    safe = safe.replace(/\*\*/g, "").replace(/\r/g, "");
-
-    // First line as topic
     const lines = safe.split("\n");
-    if (lines.length > 0 && lines[0].trim() !== "") {
-        lines[0] = `<span class="topic">${lines[0].trim()}</span>`;
+    const out = [];
+
+    for (let i = 0; i < lines.length; i++) {
+        let line = lines[i].trim();
+
+        if (!line) {
+            out.push("");
+            continue;
+        }
+
+        // First line as topic sentence/title block
+        if (i === 0) {
+            out.push(`<span class="topic">${line}</span>`);
+            continue;
+        }
+
+        // Convert **HEADING** style
+        let md = line.match(/^\*\*(.+?)\*\*$/);
+        if (md) {
+            let title = md[1].trim();
+            if (/^UPSC Trap Zone/i.test(title)) {
+                out.push(`<span class="trap">UPSC TRAP ZONE</span>`);
+            } else if (/^(Revision Takeaway|One-Line Revision Takeaway)$/i.test(title)) {
+                out.push(`<span class="takeaway">REVISION TAKEAWAY</span>`);
+            } else {
+                out.push(`<span class="heading">${title.toUpperCase()}</span>`);
+            }
+            continue;
+        }
+
+        // Convert plain headings without **
+        if (/^UPSC Trap Zone\s*⚠?$/i.test(line)) {
+            out.push(`<span class="trap">UPSC TRAP ZONE</span>`);
+            continue;
+        }
+
+        if (/^(Revision Takeaway|One-Line Revision Takeaway)$/i.test(line)) {
+            out.push(`<span class="takeaway">REVISION TAKEAWAY</span>`);
+            continue;
+        }
+
+        if (/^(Introduction|Background|Core Concepts|Core Features|Urban Layout|Administrative Structure|Political Structure|Economic Features|Important Sites|Important Facts|Geographic References|Chronology|Key Facts Table|Exam Focus|Quick Revision Flow)$/i.test(line)) {
+            out.push(`<span class="heading">${line.toUpperCase()}</span>`);
+            continue;
+        }
+
+        out.push(line);
     }
-    safe = lines.join("\n");
 
-    // Strong heading replacements
-    const normalHeadings = [
-        "Introduction",
-        "Background",
-        "Core Concepts",
-        "Core Features",
-        "Urban Layout",
-        "Administrative Structure",
-        "Political Structure",
-        "Economic Features",
-        "Important Sites",
-        "Important Facts",
-        "Geographic References",
-        "Chronology",
-        "Key Facts Table",
-        "Exam Focus",
-        "Quick Revision Flow"
-    ];
-
-    normalHeadings.forEach((heading) => {
-        const regex = new RegExp(`(^|\\n)\\s*${heading}\\s*(?=\\n|:)`, "gi");
-        safe = safe.replace(regex, `$1<span class="heading">${heading.toUpperCase()}</span>`);
-    });
-
-    safe = safe.replace(/(^|\n)\s*UPSC Trap Zone\s*⚠?\s*(?=\n|:)/gi,
-        `$1<span class="trap">UPSC TRAP ZONE</span>`
-    );
-
-    safe = safe.replace(/(^|\n)\s*(Revision Takeaway|One-Line Revision Takeaway)\s*(?=\n|:)/gi,
-        `$1<span class="takeaway">REVISION TAKEAWAY</span>`
-    );
-
-    return safe;
+    return out.join("\n");
 }
 
 function buildSections(answer) {
