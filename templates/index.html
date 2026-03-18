@@ -86,7 +86,7 @@
             padding: 14px;
         }
 
-        /* Notes styling */
+        /* Notes styling (UNCHANGED) */
         .topic {
             display: block;
             font-size: 22px;
@@ -126,57 +126,6 @@
             text-decoration: underline;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-        }
-
-        /* MCQ styling kept untouched */
-        .mcq-title {
-            display: block;
-            font-weight: 900;
-            font-size: 19px;
-            color: #1d3557;
-            margin-top: 20px;
-            margin-bottom: 10px;
-            text-decoration: underline;
-        }
-        .mcq-label {
-            display: block;
-            font-weight: 900;
-            font-size: 17px;
-            color: #1d3557;
-            margin-top: 14px;
-            margin-bottom: 6px;
-            text-decoration: underline;
-            text-transform: uppercase;
-        }
-        .mcq-logic {
-            display: block;
-            font-weight: 900;
-            font-size: 17px;
-            color: #0b6e4f;
-            margin-top: 14px;
-            margin-bottom: 6px;
-            text-decoration: underline;
-            text-transform: uppercase;
-        }
-        .mcq-wrong {
-            display: block;
-            font-weight: 900;
-            font-size: 17px;
-            color: #9c6644;
-            margin-top: 14px;
-            margin-bottom: 6px;
-            text-decoration: underline;
-            text-transform: uppercase;
-        }
-        .mcq-trap {
-            display: block;
-            font-weight: 900;
-            font-size: 17px;
-            color: #c1121f;
-            margin-top: 14px;
-            margin-bottom: 6px;
-            text-decoration: underline;
-            text-transform: uppercase;
         }
     </style>
 </head>
@@ -244,17 +193,17 @@ function formatNotesText(text) {
             continue;
         }
 
-        if (/^UPSC Trap Zone\s*⚠?$/i.test(line)) {
+        if (/^UPSC Trap Zone/i.test(line)) {
             out.push(`<span class="trap">UPSC TRAP ZONE</span>`);
             continue;
         }
 
-        if (/^(Revision Takeaway|One-Line Revision Takeaway)$/i.test(line)) {
+        if (/^Revision Takeaway/i.test(line)) {
             out.push(`<span class="takeaway">REVISION TAKEAWAY</span>`);
             continue;
         }
 
-        if (/^(Introduction|Background|Core Concepts|Core Features|Urban Layout|Administrative Structure|Political Structure|Economic Features|Important Sites|Important Facts|Geographic References|Chronology|Key Facts Table|Exam Focus|Quick Revision Flow)$/i.test(line)) {
+        if (/^(Introduction|Background|Core Concepts|Core Features)/i.test(line)) {
             out.push(`<span class="heading">${escapeHtml(line.toUpperCase())}</span>`);
             continue;
         }
@@ -265,13 +214,10 @@ function formatNotesText(text) {
     return out.join("\n");
 }
 
-/* ONLY simplified: remove ** and keep MCQ plain */
+/* ✅ FINAL FIX: MCQ text cleaned BEFORE rendering */
 function formatMcqText(text) {
-    let safe = escapeHtml(text)
-        .replace(/\r/g, "")
-        .replace(/\*\*/g, "");
-
-    return safe;
+    text = text.replace(/\*\*/g, "");  // remove ** at source
+    return `<div>${escapeHtml(text)}</div>`;
 }
 
 function buildSections(answer) {
