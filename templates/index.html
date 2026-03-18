@@ -302,6 +302,22 @@ function formatMcqText(text) {
             continue;
         }
 
+        if (/^\([a-d]\)\s+/i.test(line)) {
+            out.push(`<b>${line.substring(0,3)}</b> ${line.substring(3).trim()}`);
+            continue;
+        }
+
+        if (/^[A-D]\)\s+/i.test(line)) {
+            out.push(`<b>${line.substring(0,2)}</b> ${line.substring(2).trim()}`);
+            continue;
+        }
+
+        if (/^Answer:\s*/i.test(line)) {
+            out.push(`<span class="mcq-label">ANSWER</span>`);
+            out.push(line.replace(/^Answer:\s*/i, ""));
+            continue;
+        }
+
         if (/^Correct Answer:\s*/i.test(line)) {
             out.push(`<span class="mcq-label">CORRECT ANSWER</span>`);
             out.push(line.replace(/^Correct Answer:\s*/i, ""));
@@ -323,16 +339,6 @@ function formatMcqText(text) {
         if (/^Trap Zone:\s*/i.test(line)) {
             out.push(`<span class="mcq-trap">TRAP ZONE</span>`);
             out.push(line.replace(/^Trap Zone:\s*/i, ""));
-            continue;
-        }
-
-        if (/^\([a-d]\)\s*/i.test(line)) {
-            out.push(`<b>${line.substring(0,3)}</b> ${line.substring(3).trim()}`);
-            continue;
-        }
-
-        if (/^[A-D]\)\s*/i.test(line)) {
-            out.push(`<b>${line.substring(0,2)}</b> ${line.substring(2).trim()}`);
             continue;
         }
 
