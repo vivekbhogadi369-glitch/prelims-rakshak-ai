@@ -123,16 +123,16 @@
         }
 
         /* MCQ styling */
-        .mcq-question {
+        .mcq-title {
             display: block;
             font-weight: 900;
-            font-size: 19px;
+            font-size: 20px;
             color: #1d3557;
             margin-top: 20px;
             margin-bottom: 10px;
             text-decoration: underline;
         }
-        .mcq-answer {
+        .mcq-label {
             display: block;
             font-weight: 900;
             font-size: 17px;
@@ -275,45 +275,71 @@ function formatNotesText(text) {
 
 function formatMcqText(text) {
     let safe = escapeHtml(text).replace(/\r/g, "");
+    const lines = safe.split("\n");
+    const out = [];
 
-    safe = safe.replace(
-        /(^|\n)(\d+\.\s+[^\n]+)/g,
-        '$1<span class="mcq-question">$2</span>'
-    );
+    for (let i = 0; i < lines.length; i++) {
+        let line = lines[i].trim();
 
-    safe = safe.replace(
-        /(^|\n)Q:\s*/g,
-        '$1<span class="mcq-question">QUESTION</span>\n'
-    );
+        if (!line) {
+            out.push("");
+            continue;
+        }
 
-    safe = safe.replace(
-        /(^|\n)Options:\s*/gi,
-        '$1<span class="mcq-answer">OPTIONS</span>\n'
-    );
+        if (/^\d+\.\s+/.test(line)) {
+            out.push(`<span class="mcq-title">${line}</span>`);
+            continue;
+        }
 
-    safe = safe.replace(/(^|\n)([A-D]\))\s*/g, '$1<b>$2</b> ');
+        if (/^Q:\s*/i.test(line)) {
+            out.push(`<span class="mcq-label">QUESTION</span>`);
+            out.push(line.replace(/^Q:\s*/i, ""));
+            continue;
+        }
 
-    safe = safe.replace(
-        /(^|\n)Correct Answer\s*:/gi,
-        '$1<span class="mcq-answer">CORRECT ANSWER:</span>'
-    );
+        if (/^Options:\s*$/i.test(line)) {
+            out.push(`<span class="mcq-label">OPTIONS</span>`);
+            continue;
+        }
 
-    safe = safe.replace(
-        /(^|\n)Elimination Logic\s*:/gi,
-        '$1<span class="mcq-logic">ELIMINATION LOGIC:</span>'
-    );
+        if (/^Correct Answer:\s*/i.test(line)) {
+            out.push(`<span class="mcq-label">CORRECT ANSWER</span>`);
+            out.push(line.replace(/^Correct Answer:\s*/i, ""));
+            continue;
+        }
 
-    safe = safe.replace(
-        /(^|\n)(Why others are wrong|Why other options are wrong)\s*:/gi,
-        '$1<span class="mcq-wrong">WHY OTHER OPTIONS ARE WRONG:</span>'
-    );
+        if (/^Elimination Logic:\s*/i.test(line)) {
+            out.push(`<span class="mcq-logic">ELIMINATION LOGIC</span>`);
+            out.push(line.replace(/^Elimination Logic:\s*/i, ""));
+            continue;
+        }
 
-    safe = safe.replace(
-        /(^|\n)Trap Zone\s*:/gi,
-        '$1<span class="mcq-trap">TRAP ZONE:</span>'
-    );
+        if (/^(Why others are wrong|Why other options are wrong):\s*/i.test(line)) {
+            out.push(`<span class="mcq-wrong">WHY OTHER OPTIONS ARE WRONG</span>`);
+            out.push(line.replace(/^(Why others are wrong|Why other options are wrong):\s*/i, ""));
+            continue;
+        }
 
-    return safe;
+        if (/^Trap Zone:\s*/i.test(line)) {
+            out.push(`<span class="mcq-trap">TRAP ZONE</span>`);
+            out.push(line.replace(/^Trap Zone:\s*/i, ""));
+            continue;
+        }
+
+        if (/^\([a-d]\)\s*/i.test(line)) {
+            out.push(`<b>${line.substring(0,3)}</b> ${line.substring(3).trim()}`);
+            continue;
+        }
+
+        if (/^[A-D]\)\s*/i.test(line)) {
+            out.push(`<b>${line.substring(0,2)}</b> ${line.substring(2).trim()}`);
+            continue;
+        }
+
+        out.push(line);
+    }
+
+    return out.join("\n");
 }
 
 function buildSections(answer) {
