@@ -274,7 +274,7 @@ function formatNotesText(text) {
 }
 
 function formatMcqText(text) {
-    let safe = escapeHtml(text).replace(/\r/g, "");
+    let safe = escapeHtml(text).replace(/\r/g, "").replace(/\*\*/g, "");
     const lines = safe.split("\n");
     const out = [];
 
@@ -286,13 +286,13 @@ function formatMcqText(text) {
             continue;
         }
 
-        // MCQ title like: 1. Statement-based (Moderate)
+        // Title like: 1. Statement-based (Moderate difficulty)
         if (/^\d+\.\s+/.test(line)) {
             out.push(`<span class="mcq-title">${line}</span>`);
             continue;
         }
 
-        // Question label
+        // Question line starting with Q:
         if (/^Q:\s*/i.test(line)) {
             out.push(`<span class="mcq-label">QUESTION</span>`);
             out.push(line.replace(/^Q:\s*/i, ""));
@@ -305,34 +305,40 @@ function formatMcqText(text) {
             continue;
         }
 
-        // Option lines: (a) / (b) / (c) / (d)
-        if (/^\([a-d]\)\s+/i.test(line)) {
-            out.push(`<b>${line.substring(0,3)}</b> ${line.substring(3).trim()}`);
+        // Option formats: a) / b) / c) / d)
+        if (/^[a-d]\)\s+/i.test(line)) {
+            out.push(`<b>${line.substring(0,2)}</b> ${line.substring(2).trim()}`);
             continue;
         }
 
-        // Option lines: A) / B) / C) / D)
+        // Option formats: A) / B) / C) / D)
         if (/^[A-D]\)\s+/i.test(line)) {
             out.push(`<b>${line.substring(0,2)}</b> ${line.substring(2).trim()}`);
             continue;
         }
 
-        // Option lines: A. / B. / C. / D.
+        // Option formats: A. / B. / C. / D.
         if (/^[A-D]\.\s+/i.test(line)) {
             out.push(`<b>${line.substring(0,2)}</b> ${line.substring(2).trim()}`);
             continue;
         }
 
-        // Answer
-        if (/^Answer:\s*/i.test(line)) {
-            out.push(`<span class="mcq-label">ANSWER</span>`);
-            out.push(line.replace(/^Answer:\s*/i, ""));
+        // Option formats: (a) / (b) / (c) / (d)
+        if (/^\([a-d]\)\s+/i.test(line)) {
+            out.push(`<b>${line.substring(0,3)}</b> ${line.substring(3).trim()}`);
             continue;
         }
 
+        // Correct answer / answer
         if (/^Correct Answer:\s*/i.test(line)) {
             out.push(`<span class="mcq-label">CORRECT ANSWER</span>`);
             out.push(line.replace(/^Correct Answer:\s*/i, ""));
+            continue;
+        }
+
+        if (/^Answer:\s*/i.test(line)) {
+            out.push(`<span class="mcq-label">ANSWER</span>`);
+            out.push(line.replace(/^Answer:\s*/i, ""));
             continue;
         }
 
