@@ -35,13 +35,11 @@
             border: 1px solid #ccc;
             box-sizing: border-box;
         }
-
         .button-row {
             display: flex;
             gap: 10px;
             margin-top: 10px;
         }
-
         button {
             flex: 1;
             padding: 12px;
@@ -51,21 +49,17 @@
             background: #1d3557;
             color: white;
         }
-
         .secondary-button {
             background: #6c757d;
         }
-
         .copy-button {
             background: #2a9d8f;
         }
-
         #answer {
             margin-top: 20px;
             line-height: 1.6;
             font-size: 16px;
         }
-
         .section {
             background: #ffffff;
             border: 1px solid #d9e2ec;
@@ -73,7 +67,6 @@
             margin-top: 12px;
             overflow: hidden;
         }
-
         .section summary {
             cursor: pointer;
             padding: 14px;
@@ -81,16 +74,13 @@
             color: #1d3557;
             background: #eef4fb;
         }
-
         .section-content {
             padding: 14px;
             white-space: pre-wrap;
         }
-
         .section-content b {
             color: #1d3557;
         }
-
         .heading {
             display: block;
             font-weight: 900;
@@ -102,7 +92,6 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-
         .trap {
             display: block;
             font-weight: 900;
@@ -114,7 +103,6 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-
         .takeaway {
             display: block;
             font-weight: 900;
@@ -126,7 +114,6 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-
         .topic {
             display: block;
             font-size: 22px;
@@ -134,7 +121,6 @@
             color: #1d3557;
             margin-bottom: 12px;
         }
-
         .plain-answer {
             white-space: pre-wrap;
             background: #ffffff;
@@ -154,7 +140,6 @@ Ask any UPSC topic and instantly get PYQs, Quick Revision Notes, and Practice MC
 </p>
 
 <div class="box">
-
 <p><b>Ask in this format:</b> topic, subject</p>
 <p><b>Example:</b> Indus Town Planning, Indian History</p>
 
@@ -167,7 +152,6 @@ Ask any UPSC topic and instantly get PYQs, Quick Revision Notes, and Practice MC
 </div>
 
 <div id="answer">Your answer will appear here.</div>
-
 </div>
 
 <script>
@@ -178,14 +162,27 @@ function escapeHtml(text) {
         .replace(/>/g, "&gt;");
 }
 
-function formatPyqText(text){
+function formatPyqText(text) {
     let safe = escapeHtml(text);
     safe = safe.replace(/(20\d{2}\s*-\s*UPSC Prelims)/g, "<b>$1</b>");
     return safe;
 }
 
-function formatNotesText(text){
-    const headings = [
+function formatNotesText(text) {
+    let safe = escapeHtml(text);
+
+    // Remove markdown stars and normalize line endings
+    safe = safe.replace(/\*\*/g, "").replace(/\r/g, "");
+
+    // First line as topic
+    const lines = safe.split("\n");
+    if (lines.length > 0 && lines[0].trim() !== "") {
+        lines[0] = `<span class="topic">${lines[0].trim()}</span>`;
+    }
+    safe = lines.join("\n");
+
+    // Strong heading replacements
+    const normalHeadings = [
         "Introduction",
         "Background",
         "Core Concepts",
@@ -203,47 +200,23 @@ function formatNotesText(text){
         "Quick Revision Flow"
     ];
 
-    const lines = text.replace(/\*\*/g, "").split("\n");
-    const out = [];
+    normalHeadings.forEach((heading) => {
+        const regex = new RegExp(`(^|\\n)\\s*${heading}\\s*(?=\\n|:)`, "gi");
+        safe = safe.replace(regex, `$1<span class="heading">${heading.toUpperCase()}</span>`);
+    });
 
-    for (let i = 0; i < lines.length; i++) {
-        let line = lines[i].trim();
+    safe = safe.replace(/(^|\n)\s*UPSC Trap Zone\s*⚠?\s*(?=\n|:)/gi,
+        `$1<span class="trap">UPSC TRAP ZONE</span>`
+    );
 
-        if (!line) {
-            out.push("");
-            continue;
-        }
+    safe = safe.replace(/(^|\n)\s*(Revision Takeaway|One-Line Revision Takeaway)\s*(?=\n|:)/gi,
+        `$1<span class="takeaway">REVISION TAKEAWAY</span>`
+    );
 
-        const escaped = escapeHtml(line);
-
-        if (i === 0) {
-            out.push(`<span class="topic">${escaped}</span>`);
-            continue;
-        }
-
-        if (/^UPSC Trap Zone\s*⚠?$/i.test(line)) {
-            out.push(`<span class="trap">UPSC TRAP ZONE</span>`);
-            continue;
-        }
-
-        if (/^(Revision Takeaway|One-Line Revision Takeaway)$/i.test(line)) {
-            out.push(`<span class="takeaway">REVISION TAKEAWAY</span>`);
-            continue;
-        }
-
-        const matchedHeading = headings.find(h => h.toLowerCase() === line.toLowerCase());
-        if (matchedHeading) {
-            out.push(`<span class="heading">${matchedHeading.toUpperCase()}</span>`);
-            continue;
-        }
-
-        out.push(escaped);
-    }
-
-    return out.join("\n");
+    return safe;
 }
 
-function buildSections(answer){
+function buildSections(answer) {
     const pyqHeading = "A. UPSC PRELIMS PYQs";
     const notesHeading = "B. QUICK REVISION NOTES";
     const mcqHeading = "C. PRACTICE MCQs";
@@ -278,17 +251,17 @@ function buildSections(answer){
 `;
 }
 
-function resetAI(){
+function resetAI() {
     document.getElementById("question").value = "";
     document.getElementById("answer").innerText = "Your answer will appear here.";
 }
 
-function copyAnswer(){
+function copyAnswer() {
     const text = document.getElementById("answer").innerText;
     navigator.clipboard.writeText(text);
 }
 
-async function askAI(){
+async function askAI() {
     const question = document.getElementById("question").value;
     const answerBox = document.getElementById("answer");
     const askButton = document.getElementById("askButton");
@@ -300,13 +273,13 @@ async function askAI(){
     try {
         const response = await fetch("https://prelims-rakshak-ai-production.up.railway.app/ask", {
             method: "POST",
-            headers: { "Content-Type":"application/json" },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ message: question })
         });
 
         const data = await response.json();
         answerBox.innerHTML = buildSections(data.answer || "No answer received.");
-    } catch(error) {
+    } catch (error) {
         answerBox.innerHTML = `<div class="plain-answer">Error: ${escapeHtml(error.toString())}</div>`;
     }
 
