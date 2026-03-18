@@ -286,32 +286,44 @@ function formatMcqText(text) {
             continue;
         }
 
+        // MCQ title like: 1. Statement-based (Moderate)
         if (/^\d+\.\s+/.test(line)) {
             out.push(`<span class="mcq-title">${line}</span>`);
             continue;
         }
 
+        // Question label
         if (/^Q:\s*/i.test(line)) {
             out.push(`<span class="mcq-label">QUESTION</span>`);
             out.push(line.replace(/^Q:\s*/i, ""));
             continue;
         }
 
+        // Options heading
         if (/^Options:\s*$/i.test(line)) {
             out.push(`<span class="mcq-label">OPTIONS</span>`);
             continue;
         }
 
+        // Option lines: (a) / (b) / (c) / (d)
         if (/^\([a-d]\)\s+/i.test(line)) {
             out.push(`<b>${line.substring(0,3)}</b> ${line.substring(3).trim()}`);
             continue;
         }
 
+        // Option lines: A) / B) / C) / D)
         if (/^[A-D]\)\s+/i.test(line)) {
             out.push(`<b>${line.substring(0,2)}</b> ${line.substring(2).trim()}`);
             continue;
         }
 
+        // Option lines: A. / B. / C. / D.
+        if (/^[A-D]\.\s+/i.test(line)) {
+            out.push(`<b>${line.substring(0,2)}</b> ${line.substring(2).trim()}`);
+            continue;
+        }
+
+        // Answer
         if (/^Answer:\s*/i.test(line)) {
             out.push(`<span class="mcq-label">ANSWER</span>`);
             out.push(line.replace(/^Answer:\s*/i, ""));
@@ -324,18 +336,21 @@ function formatMcqText(text) {
             continue;
         }
 
+        // Elimination logic
         if (/^Elimination Logic:\s*/i.test(line)) {
             out.push(`<span class="mcq-logic">ELIMINATION LOGIC</span>`);
             out.push(line.replace(/^Elimination Logic:\s*/i, ""));
             continue;
         }
 
+        // Why other options are wrong
         if (/^(Why others are wrong|Why other options are wrong):\s*/i.test(line)) {
             out.push(`<span class="mcq-wrong">WHY OTHER OPTIONS ARE WRONG</span>`);
             out.push(line.replace(/^(Why others are wrong|Why other options are wrong):\s*/i, ""));
             continue;
         }
 
+        // Trap zone
         if (/^Trap Zone:\s*/i.test(line)) {
             out.push(`<span class="mcq-trap">TRAP ZONE</span>`);
             out.push(line.replace(/^Trap Zone:\s*/i, ""));
