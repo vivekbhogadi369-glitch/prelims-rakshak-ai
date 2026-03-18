@@ -128,7 +128,7 @@
             letter-spacing: 0.5px;
         }
 
-        /* MCQ styling */
+        /* MCQ styling kept untouched */
         .mcq-title {
             display: block;
             font-weight: 900;
@@ -265,102 +265,13 @@ function formatNotesText(text) {
     return out.join("\n");
 }
 
+/* ONLY simplified: remove ** and keep MCQ plain */
 function formatMcqText(text) {
-    const rawLines = text.replace(/\r/g, "").split("\n");
-    const out = [];
+    let safe = escapeHtml(text)
+        .replace(/\r/g, "")
+        .replace(/\*\*/g, "");
 
-    for (let i = 0; i < rawLines.length; i++) {
-        let line = cleanMarkdownLine(rawLines[i]);
-
-        if (!line) {
-            out.push("");
-            continue;
-        }
-
-        // MCQ title
-        if (/^\d+\.\s+/.test(line)) {
-            out.push(`<span class="mcq-title">${escapeHtml(line)}</span>`);
-            continue;
-        }
-
-        // Question line variants
-        if (/^Question:\s*/i.test(line)) {
-            out.push(`<span class="mcq-label">QUESTION</span>`);
-            out.push(escapeHtml(line.replace(/^Question:\s*/i, "")));
-            continue;
-        }
-
-        if (/^Q:\s*/i.test(line)) {
-            out.push(`<span class="mcq-label">QUESTION</span>`);
-            out.push(escapeHtml(line.replace(/^Q:\s*/i, "")));
-            continue;
-        }
-
-        // Options heading
-        if (/^Options:\s*$/i.test(line)) {
-            out.push(`<span class="mcq-label">OPTIONS</span>`);
-            continue;
-        }
-
-        // Option lines
-        if (/^\([a-d]\)\s+/i.test(line)) {
-            out.push(`<b>${escapeHtml(line.substring(0,3))}</b> ${escapeHtml(line.substring(3).trim())}`);
-            continue;
-        }
-
-        if (/^[a-d]\)\s+/i.test(line)) {
-            out.push(`<b>${escapeHtml(line.substring(0,2))}</b> ${escapeHtml(line.substring(2).trim())}`);
-            continue;
-        }
-
-        if (/^[A-D]\)\s+/i.test(line)) {
-            out.push(`<b>${escapeHtml(line.substring(0,2))}</b> ${escapeHtml(line.substring(2).trim())}`);
-            continue;
-        }
-
-        if (/^[A-D]\.\s+/i.test(line)) {
-            out.push(`<b>${escapeHtml(line.substring(0,2))}</b> ${escapeHtml(line.substring(2).trim())}`);
-            continue;
-        }
-
-        // Answer labels
-        if (/^Correct Answer:\s*/i.test(line)) {
-            out.push(`<span class="mcq-label">CORRECT ANSWER</span>`);
-            out.push(escapeHtml(line.replace(/^Correct Answer:\s*/i, "")));
-            continue;
-        }
-
-        if (/^Answer:\s*/i.test(line)) {
-            out.push(`<span class="mcq-label">ANSWER</span>`);
-            out.push(escapeHtml(line.replace(/^Answer:\s*/i, "")));
-            continue;
-        }
-
-        // Elimination Logic
-        if (/^Elimination Logic:\s*/i.test(line)) {
-            out.push(`<span class="mcq-logic">ELIMINATION LOGIC</span>`);
-            out.push(escapeHtml(line.replace(/^Elimination Logic:\s*/i, "")));
-            continue;
-        }
-
-        // Wrong options
-        if (/^(Why others are wrong|Why other options are wrong):\s*/i.test(line)) {
-            out.push(`<span class="mcq-wrong">WHY OTHER OPTIONS ARE WRONG</span>`);
-            out.push(escapeHtml(line.replace(/^(Why others are wrong|Why other options are wrong):\s*/i, "")));
-            continue;
-        }
-
-        // Trap zone
-        if (/^Trap Zone:\s*/i.test(line)) {
-            out.push(`<span class="mcq-trap">TRAP ZONE</span>`);
-            out.push(escapeHtml(line.replace(/^Trap Zone:\s*/i, "")));
-            continue;
-        }
-
-        out.push(escapeHtml(line));
-    }
-
-    return out.join("\n");
+    return safe;
 }
 
 function buildSections(answer) {
