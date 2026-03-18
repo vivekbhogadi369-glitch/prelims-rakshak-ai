@@ -276,14 +276,23 @@ function formatNotesText(text) {
 function formatMcqText(text) {
     let safe = escapeHtml(text).replace(/\r/g, "");
 
-    // Style numbered question headings like:
-    // 1. Statement Based (Easy)
     safe = safe.replace(
         /(^|\n)(\d+\.\s+[^\n]+)/g,
         '$1<span class="mcq-question">$2</span>'
     );
 
-    // Style section labels
+    safe = safe.replace(
+        /(^|\n)Q:\s*/g,
+        '$1<span class="mcq-question">QUESTION</span>\n'
+    );
+
+    safe = safe.replace(
+        /(^|\n)Options:\s*/gi,
+        '$1<span class="mcq-answer">OPTIONS</span>\n'
+    );
+
+    safe = safe.replace(/(^|\n)([A-D]\))\s*/g, '$1<b>$2</b> ');
+
     safe = safe.replace(
         /(^|\n)Correct Answer\s*:/gi,
         '$1<span class="mcq-answer">CORRECT ANSWER:</span>'
@@ -295,7 +304,7 @@ function formatMcqText(text) {
     );
 
     safe = safe.replace(
-        /(^|\n)Why other options are wrong\s*:/gi,
+        /(^|\n)(Why others are wrong|Why other options are wrong)\s*:/gi,
         '$1<span class="mcq-wrong">WHY OTHER OPTIONS ARE WRONG:</span>'
     );
 
