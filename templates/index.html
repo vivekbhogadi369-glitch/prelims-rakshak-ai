@@ -57,7 +57,7 @@
         }
         #answer {
             margin-top: 20px;
-            line-height: 1.6;
+            line-height: 1.7;
             font-size: 16px;
         }
         .section {
@@ -78,8 +78,21 @@
             padding: 14px;
             white-space: pre-wrap;
         }
-        .section-content b {
+        .plain-answer {
+            white-space: pre-wrap;
+            background: #ffffff;
+            border: 1px solid #d9e2ec;
+            border-radius: 10px;
+            padding: 14px;
+        }
+
+        /* Notes styling */
+        .topic {
+            display: block;
+            font-size: 22px;
+            font-weight: 900;
             color: #1d3557;
+            margin-bottom: 12px;
         }
         .heading {
             display: block;
@@ -114,19 +127,12 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-        .topic {
-            display: block;
-            font-size: 22px;
-            font-weight: 900;
-            color: #1d3557;
-            margin-bottom: 12px;
-        }
 
         /* MCQ styling */
         .mcq-title {
             display: block;
             font-weight: 900;
-            font-size: 20px;
+            font-size: 19px;
             color: #1d3557;
             margin-top: 20px;
             margin-bottom: 10px;
@@ -172,14 +178,6 @@
             text-decoration: underline;
             text-transform: uppercase;
         }
-
-        .plain-answer {
-            white-space: pre-wrap;
-            background: #ffffff;
-            border: 1px solid #d9e2ec;
-            border-radius: 10px;
-            padding: 14px;
-        }
     </style>
 </head>
 <body>
@@ -192,18 +190,18 @@ Ask any UPSC topic and instantly get PYQs, Quick Revision Notes, and Practice MC
 </p>
 
 <div class="box">
-<p><b>Ask in this format:</b> topic, subject</p>
-<p><b>Example:</b> Indus Town Planning, Indian History</p>
+    <p><b>Ask in this format:</b> topic, subject</p>
+    <p><b>Example:</b> Indus Town Planning, Indian History</p>
 
-<textarea id="question" placeholder="Example: Indus Town Planning, Indian History"></textarea>
+    <textarea id="question" placeholder="Example: Indus Town Planning, Indian History"></textarea>
 
-<div class="button-row">
-<button id="askButton" onclick="askAI()">Ask</button>
-<button class="secondary-button" onclick="resetAI()">Reset</button>
-<button class="copy-button" onclick="copyAnswer()">Copy</button>
-</div>
+    <div class="button-row">
+        <button id="askButton" onclick="askAI()">Ask</button>
+        <button class="secondary-button" onclick="resetAI()">Reset</button>
+        <button class="copy-button" onclick="copyAnswer()">Copy</button>
+    </div>
 
-<div id="answer">Your answer will appear here.</div>
+    <div id="answer">Your answer will appear here.</div>
 </div>
 
 <script>
@@ -214,41 +212,35 @@ function escapeHtml(text) {
         .replace(/>/g, "&gt;");
 }
 
+function cleanMarkdownLine(line) {
+    let s = line.trim();
+    s = s.replace(/^#{1,6}\s*/, "");
+    s = s.replace(/\*\*/g, "");
+    return s.trim();
+}
+
 function formatPyqText(text) {
-    let safe = escapeHtml(text);
+    let safe = escapeHtml(text).replace(/\r/g, "").replace(/\*\*/g, "");
     safe = safe.replace(/(20\d{2}\s*-\s*UPSC Prelims)/g, "<b>$1</b>");
     return safe;
 }
 
 function formatNotesText(text) {
-    let safe = escapeHtml(text).replace(/\r/g, "");
-
-    const lines = safe.split("\n");
+    const rawLines = text.replace(/\r/g, "").split("\n");
     const out = [];
+    let firstNonEmptyHandled = false;
 
-    for (let i = 0; i < lines.length; i++) {
-        let line = lines[i].trim();
+    for (let i = 0; i < rawLines.length; i++) {
+        let line = cleanMarkdownLine(rawLines[i]);
 
         if (!line) {
             out.push("");
             continue;
         }
 
-        if (i === 0) {
-            out.push(`<span class="topic">${line}</span>`);
-            continue;
-        }
-
-        let md = line.match(/^\*\*(.+?)\*\*$/);
-        if (md) {
-            let title = md[1].trim();
-            if (/^UPSC Trap Zone/i.test(title)) {
-                out.push(`<span class="trap">UPSC TRAP ZONE</span>`);
-            } else if (/^(Revision Takeaway|One-Line Revision Takeaway)$/i.test(title)) {
-                out.push(`<span class="takeaway">REVISION TAKEAWAY</span>`);
-            } else {
-                out.push(`<span class="heading">${title.toUpperCase()}</span>`);
-            }
+        if (!firstNonEmptyHandled) {
+            out.push(`<span class="topic">${escapeHtml(line)}</span>`);
+            firstNonEmptyHandled = true;
             continue;
         }
 
@@ -263,39 +255,44 @@ function formatNotesText(text) {
         }
 
         if (/^(Introduction|Background|Core Concepts|Core Features|Urban Layout|Administrative Structure|Political Structure|Economic Features|Important Sites|Important Facts|Geographic References|Chronology|Key Facts Table|Exam Focus|Quick Revision Flow)$/i.test(line)) {
-            out.push(`<span class="heading">${line.toUpperCase()}</span>`);
+            out.push(`<span class="heading">${escapeHtml(line.toUpperCase())}</span>`);
             continue;
         }
 
-        out.push(line);
+        out.push(escapeHtml(line));
     }
 
     return out.join("\n");
 }
 
 function formatMcqText(text) {
-    let safe = escapeHtml(text).replace(/\r/g, "").replace(/\*\*/g, "");
-    const lines = safe.split("\n");
+    const rawLines = text.replace(/\r/g, "").split("\n");
     const out = [];
 
-    for (let i = 0; i < lines.length; i++) {
-        let line = lines[i].trim();
+    for (let i = 0; i < rawLines.length; i++) {
+        let line = cleanMarkdownLine(rawLines[i]);
 
         if (!line) {
             out.push("");
             continue;
         }
 
-        // Title like: 1. Statement-based (Moderate difficulty)
+        // MCQ title
         if (/^\d+\.\s+/.test(line)) {
-            out.push(`<span class="mcq-title">${line}</span>`);
+            out.push(`<span class="mcq-title">${escapeHtml(line)}</span>`);
             continue;
         }
 
-        // Question line starting with Q:
+        // Question line variants
+        if (/^Question:\s*/i.test(line)) {
+            out.push(`<span class="mcq-label">QUESTION</span>`);
+            out.push(escapeHtml(line.replace(/^Question:\s*/i, "")));
+            continue;
+        }
+
         if (/^Q:\s*/i.test(line)) {
             out.push(`<span class="mcq-label">QUESTION</span>`);
-            out.push(line.replace(/^Q:\s*/i, ""));
+            out.push(escapeHtml(line.replace(/^Q:\s*/i, "")));
             continue;
         }
 
@@ -305,65 +302,62 @@ function formatMcqText(text) {
             continue;
         }
 
-        // Option formats: a) / b) / c) / d)
-        if (/^[a-d]\)\s+/i.test(line)) {
-            out.push(`<b>${line.substring(0,2)}</b> ${line.substring(2).trim()}`);
-            continue;
-        }
-
-        // Option formats: A) / B) / C) / D)
-        if (/^[A-D]\)\s+/i.test(line)) {
-            out.push(`<b>${line.substring(0,2)}</b> ${line.substring(2).trim()}`);
-            continue;
-        }
-
-        // Option formats: A. / B. / C. / D.
-        if (/^[A-D]\.\s+/i.test(line)) {
-            out.push(`<b>${line.substring(0,2)}</b> ${line.substring(2).trim()}`);
-            continue;
-        }
-
-        // Option formats: (a) / (b) / (c) / (d)
+        // Option lines
         if (/^\([a-d]\)\s+/i.test(line)) {
-            out.push(`<b>${line.substring(0,3)}</b> ${line.substring(3).trim()}`);
+            out.push(`<b>${escapeHtml(line.substring(0,3))}</b> ${escapeHtml(line.substring(3).trim())}`);
             continue;
         }
 
-        // Correct answer / answer
+        if (/^[a-d]\)\s+/i.test(line)) {
+            out.push(`<b>${escapeHtml(line.substring(0,2))}</b> ${escapeHtml(line.substring(2).trim())}`);
+            continue;
+        }
+
+        if (/^[A-D]\)\s+/i.test(line)) {
+            out.push(`<b>${escapeHtml(line.substring(0,2))}</b> ${escapeHtml(line.substring(2).trim())}`);
+            continue;
+        }
+
+        if (/^[A-D]\.\s+/i.test(line)) {
+            out.push(`<b>${escapeHtml(line.substring(0,2))}</b> ${escapeHtml(line.substring(2).trim())}`);
+            continue;
+        }
+
+        // Answer labels
         if (/^Correct Answer:\s*/i.test(line)) {
             out.push(`<span class="mcq-label">CORRECT ANSWER</span>`);
-            out.push(line.replace(/^Correct Answer:\s*/i, ""));
+            out.push(escapeHtml(line.replace(/^Correct Answer:\s*/i, "")));
             continue;
         }
 
         if (/^Answer:\s*/i.test(line)) {
             out.push(`<span class="mcq-label">ANSWER</span>`);
-            out.push(line.replace(/^Answer:\s*/i, ""));
+            out.push(escapeHtml(line.replace(/^Answer:\s*/i, "")));
             continue;
         }
 
-        // Elimination logic
+        // Elimination Logic
         if (/^Elimination Logic:\s*/i.test(line)) {
             out.push(`<span class="mcq-logic">ELIMINATION LOGIC</span>`);
-            out.push(line.replace(/^Elimination Logic:\s*/i, ""));
+            out.push(escapeHtml(line.replace(/^Elimination Logic:\s*/i, "")));
             continue;
         }
 
-        // Why other options are wrong
+        // Wrong options
         if (/^(Why others are wrong|Why other options are wrong):\s*/i.test(line)) {
             out.push(`<span class="mcq-wrong">WHY OTHER OPTIONS ARE WRONG</span>`);
-            out.push(line.replace(/^(Why others are wrong|Why other options are wrong):\s*/i, ""));
+            out.push(escapeHtml(line.replace(/^(Why others are wrong|Why other options are wrong):\s*/i, "")));
             continue;
         }
 
         // Trap zone
         if (/^Trap Zone:\s*/i.test(line)) {
             out.push(`<span class="mcq-trap">TRAP ZONE</span>`);
-            out.push(line.replace(/^Trap Zone:\s*/i, ""));
+            out.push(escapeHtml(line.replace(/^Trap Zone:\s*/i, "")));
             continue;
         }
 
-        out.push(line);
+        out.push(escapeHtml(line));
     }
 
     return out.join("\n");
