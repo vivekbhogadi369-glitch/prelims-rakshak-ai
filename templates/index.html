@@ -128,7 +128,7 @@
             letter-spacing: 0.5px;
         }
 
-        /* MCQ headings */
+        /* MCQ style only */
         .mcq-heading-question {
             display: block;
             font-weight: 900;
@@ -139,6 +139,7 @@
             text-decoration: underline;
             text-transform: uppercase;
         }
+
         .mcq-heading-options {
             display: block;
             font-weight: 900;
@@ -149,6 +150,7 @@
             text-decoration: underline;
             text-transform: uppercase;
         }
+
         .mcq-heading-answer {
             display: block;
             font-weight: 900;
@@ -159,6 +161,7 @@
             text-decoration: underline;
             text-transform: uppercase;
         }
+
         .mcq-heading-logic {
             display: block;
             font-weight: 900;
@@ -169,16 +172,7 @@
             text-decoration: underline;
             text-transform: uppercase;
         }
-        .mcq-heading-wrong {
-            display: block;
-            font-weight: 900;
-            font-size: 18px;
-            color: #9c6644;
-            margin-top: 14px;
-            margin-bottom: 6px;
-            text-decoration: underline;
-            text-transform: uppercase;
-        }
+
         .mcq-heading-trap {
             display: block;
             font-weight: 900;
@@ -190,7 +184,17 @@
             text-transform: uppercase;
         }
 
-        /* MCQ card */
+        .mcq-heading-wrong {
+            display: block;
+            font-weight: 900;
+            font-size: 18px;
+            color: #9c6644;
+            margin-top: 14px;
+            margin-bottom: 6px;
+            text-decoration: underline;
+            text-transform: uppercase;
+        }
+
         .mcq-card {
             background: #ffffff;
             border: 1px solid #d9e2ec;
@@ -288,61 +292,75 @@ function formatNotesText(text) {
 
 function formatMcqText(text) {
     const rawLines = text.replace(/\r/g, "").split("\n");
-    const out = [];
+
+    let cards = [];
+    let current = [];
+
+    function pushCard() {
+        if (current.length > 0) {
+            cards.push(`<div class="mcq-card">${current.join("\n")}</div>`);
+            current = [];
+        }
+    }
 
     for (let i = 0; i < rawLines.length; i++) {
         let line = rawLines[i].replace(/\*\*/g, "").trim();
 
-        if (!line) {
-            out.push("");
+        if (!line) continue;
+
+        if (/^\d+\./.test(line)) {
+            pushCard();
+            current.push(`<b>${escapeHtml(line)}</b>`);
             continue;
         }
 
         if (/^(\d+\.\s*)?(Q:|Question:)/i.test(line)) {
-            out.push(`<span class="mcq-heading-question">QUESTION</span>`);
+            current.push(`<span class="mcq-heading-question">QUESTION</span>`);
             line = line.replace(/^(\d+\.\s*)?(Q:|Question:)/i, "").trim();
-            if (line) out.push(escapeHtml(line));
+            if (line) current.push(escapeHtml(line));
             continue;
         }
 
         if (/^Options:/i.test(line)) {
-            out.push(`<span class="mcq-heading-options">OPTIONS</span>`);
+            current.push(`<span class="mcq-heading-options">OPTIONS</span>`);
             continue;
         }
 
         if (/^\(?[A-Da-d]\)?[\.\)]\s*/.test(line)) {
-            out.push(`<b>${escapeHtml(line)}</b>`);
+            current.push(`<div style="margin-left:10px;"><b>${escapeHtml(line)}</b></div>`);
             continue;
         }
 
         if (/^(Correct Answer:|Answer:)/i.test(line)) {
-            out.push(`<span class="mcq-heading-answer">CORRECT ANSWER</span>`);
-            out.push(escapeHtml(line.replace(/^(Correct Answer:|Answer:)/i, "").trim()));
+            current.push(`<span class="mcq-heading-answer">CORRECT ANSWER</span>`);
+            current.push(`<div>${escapeHtml(line.replace(/^(Correct Answer:|Answer:)/i, "").trim())}</div>`);
             continue;
         }
 
         if (/^Elimination Logic:/i.test(line)) {
-            out.push(`<span class="mcq-heading-logic">ELIMINATION LOGIC</span>`);
-            out.push(escapeHtml(line.replace(/^Elimination Logic:/i, "").trim()));
+            current.push(`<span class="mcq-heading-logic">ELIMINATION LOGIC</span>`);
+            current.push(`<div>${escapeHtml(line.replace(/^Elimination Logic:/i, "").trim())}</div>`);
             continue;
         }
 
         if (/^(Why others are wrong|Why other options are wrong):/i.test(line)) {
-            out.push(`<span class="mcq-heading-wrong">WHY OTHER OPTIONS ARE WRONG</span>`);
-            out.push(escapeHtml(line.replace(/^(Why others are wrong|Why other options are wrong):/i, "").trim()));
+            current.push(`<span class="mcq-heading-wrong">WHY OTHER OPTIONS ARE WRONG</span>`);
+            current.push(`<div>${escapeHtml(line.replace(/^(Why others are wrong|Why other options are wrong):/i, "").trim())}</div>`);
             continue;
         }
 
         if (/^Trap Zone:/i.test(line)) {
-            out.push(`<span class="mcq-heading-trap">TRAP ZONE</span>`);
-            out.push(escapeHtml(line.replace(/^Trap Zone:/i, "").trim()));
+            current.push(`<span class="mcq-heading-trap">TRAP ZONE</span>`);
+            current.push(`<div>${escapeHtml(line.replace(/^Trap Zone:/i, "").trim())}</div>`);
             continue;
         }
 
-        out.push(escapeHtml(line));
+        current.push(escapeHtml(line));
     }
 
-    return `<div class="mcq-card">${out.join("\n")}</div>`;
+    pushCard();
+
+    return cards.join("");
 }
 
 function buildSections(answer) {
