@@ -118,8 +118,8 @@
         }
         .takeaway {
             display: block;
-            font-weight: 900;
             font-size: 18px;
+            font-weight: 900;
             color: #7c3aed;
             margin-top: 18px;
             margin-bottom: 8px;
@@ -202,6 +202,18 @@
             padding: 16px;
             margin-top: 16px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        /* NEW: correct answer highlight only */
+        .mcq-answer-value {
+            display: inline-block;
+            margin-top: 4px;
+            padding: 6px 10px;
+            border-radius: 8px;
+            background: #e8f7ee;
+            color: #0b6e4f;
+            font-weight: 700;
+            border: 1px solid #b7e4c7;
         }
     </style>
 </head>
@@ -333,7 +345,7 @@ function formatMcqText(text) {
 
         if (/^(Correct Answer:|Answer:)/i.test(line)) {
             current.push(`<span class="mcq-heading-answer">CORRECT ANSWER</span>`);
-            current.push(`<div>${escapeHtml(line.replace(/^(Correct Answer:|Answer:)/i, "").trim())}</div>`);
+            current.push(`<div class="mcq-answer-value">${escapeHtml(line.replace(/^(Correct Answer:|Answer:)/i, "").trim())}</div>`);
             continue;
         }
 
