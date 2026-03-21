@@ -19,6 +19,7 @@
             text-align: center;
             font-size: 16px;
             margin-bottom: 20px;
+            line-height: 1.6;
         }
         .box {
             background: white;
@@ -57,7 +58,7 @@
         }
         #answer {
             margin-top: 20px;
-            line-height: 1.7;
+            line-height: 1.8;
             font-size: 16px;
         }
         .section {
@@ -75,8 +76,9 @@
             background: #eef4fb;
         }
         .section-content {
-            padding: 14px;
+            padding: 16px;
             white-space: pre-wrap;
+            line-height: 1.85;
         }
         .plain-answer {
             white-space: pre-wrap;
@@ -89,43 +91,47 @@
         /* Notes styling */
         .topic {
             display: block;
-            font-size: 22px;
+            font-size: 24px;
             font-weight: 900;
             color: #1d3557;
-            margin-bottom: 12px;
+            margin-bottom: 14px;
+            line-height: 1.4;
         }
         .heading {
             display: block;
             font-weight: 900;
             font-size: 18px;
             color: #1d3557;
-            margin-top: 18px;
-            margin-bottom: 8px;
+            margin-top: 22px;
+            margin-bottom: 10px;
             text-decoration: underline;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            line-height: 1.5;
         }
         .trap {
             display: block;
             font-weight: 900;
             font-size: 18px;
             color: #c1121f;
-            margin-top: 18px;
-            margin-bottom: 8px;
+            margin-top: 22px;
+            margin-bottom: 10px;
             text-decoration: underline;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            line-height: 1.5;
         }
         .takeaway {
             display: block;
             font-size: 18px;
             font-weight: 900;
             color: #7c3aed;
-            margin-top: 18px;
-            margin-bottom: 8px;
+            margin-top: 22px;
+            margin-bottom: 10px;
             text-decoration: underline;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            line-height: 1.5;
         }
 
         /* MCQ style only */
@@ -204,7 +210,7 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
-        /* NEW: correct answer highlight only */
+        /* correct answer highlight */
         .mcq-answer-value {
             display: inline-block;
             margin-top: 4px;
@@ -214,6 +220,59 @@
             color: #0b6e4f;
             font-weight: 700;
             border: 1px solid #b7e4c7;
+        }
+
+        /* Notes readability polish only */
+        .section-content .notes-bullet {
+            display: block;
+            margin-left: 10px;
+            margin-bottom: 6px;
+        }
+
+        .section-content .notes-table-line {
+            display: block;
+            font-family: monospace;
+            background: #f8fafc;
+            border-radius: 6px;
+            padding: 4px 8px;
+            margin: 4px 0;
+            overflow-x: auto;
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 14px;
+            }
+
+            .box {
+                padding: 14px;
+            }
+
+            .button-row {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+
+            #answer {
+                font-size: 15px;
+                line-height: 1.8;
+            }
+
+            .section-content {
+                padding: 14px;
+                line-height: 1.85;
+            }
+
+            .topic {
+                font-size: 21px;
+            }
+
+            .heading, .trap, .takeaway {
+                font-size: 17px;
+            }
         }
     </style>
 </head>
@@ -293,6 +352,16 @@ function formatNotesText(text) {
 
         if (/^(Introduction|Background|Core Concepts|Core Features|Urban Layout|Administrative Structure|Political Structure|Economic Features|Important Sites|Important Facts|Geographic References|Chronology|Key Facts Table|Exam Focus|Quick Revision Flow)$/i.test(line)) {
             out.push(`<span class="heading">${escapeHtml(line.toUpperCase())}</span>`);
+            continue;
+        }
+
+        if (/^[-•]\s+/.test(line)) {
+            out.push(`<span class="notes-bullet">${escapeHtml(line)}</span>`);
+            continue;
+        }
+
+        if (/\|/.test(line)) {
+            out.push(`<span class="notes-table-line">${escapeHtml(line)}</span>`);
             continue;
         }
 
