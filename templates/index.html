@@ -210,7 +210,6 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
-        /* Only new addition */
         .mcq-answer-value {
             display: inline-block;
             margin-top: 4px;
@@ -326,7 +325,8 @@ function formatMcqText(text) {
 
         if (!line) continue;
 
-        if (/^\d+\./.test(line)) {
+        /* Only MAIN MCQ headings start a new card, not statement lines like 1. 2. 3. */
+        if (/^\d+\.\s+[A-Z]/.test(line)) {
             pushCard();
             current.push(`<b>${escapeHtml(line)}</b>`);
             continue;
