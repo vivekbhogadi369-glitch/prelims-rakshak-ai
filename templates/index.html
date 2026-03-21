@@ -128,6 +128,31 @@
             letter-spacing: 0.5px;
         }
 
+        /* PREMIUM NOTES BOXES */
+        .note-block {
+            background: #f8fbff;
+            border-left: 5px solid #1d3557;
+            padding: 12px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+        }
+
+        .note-block-trap {
+            background: #fff5f5;
+            border-left: 5px solid #c1121f;
+            padding: 12px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+        }
+
+        .note-block-takeaway {
+            background: #f3e8ff;
+            border-left: 5px solid #7c3aed;
+            padding: 12px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+        }
+
         /* MCQ style only */
         .mcq-heading-question {
             display: block;
@@ -272,6 +297,8 @@ function formatNotesText(text) {
     const out = [];
     let firstNonEmptyHandled = false;
 
+    out.push(`<div class="note-block">`);
+
     for (let i = 0; i < rawLines.length; i++) {
         let line = cleanMarkdownLine(rawLines[i]);
 
@@ -281,28 +308,38 @@ function formatNotesText(text) {
         }
 
         if (!firstNonEmptyHandled) {
+            out.push(`</div>`);
             out.push(`<span class="topic">${escapeHtml(line)}</span>`);
+            out.push(`<div class="note-block">`);
             firstNonEmptyHandled = true;
             continue;
         }
 
         if (/^UPSC Trap Zone\s*⚠?$/i.test(line)) {
+            out.push(`</div>`);
             out.push(`<span class="trap">UPSC TRAP ZONE</span>`);
+            out.push(`<div class="note-block-trap">`);
             continue;
         }
 
         if (/^(Revision Takeaway|One-Line Revision Takeaway)$/i.test(line)) {
+            out.push(`</div>`);
             out.push(`<span class="takeaway">REVISION TAKEAWAY</span>`);
+            out.push(`<div class="note-block-takeaway">`);
             continue;
         }
 
         if (/^(Introduction|Background|Core Concepts|Core Features|Urban Layout|Administrative Structure|Political Structure|Economic Features|Important Sites|Important Facts|Geographic References|Chronology|Key Facts Table|Exam Focus|Quick Revision Flow)$/i.test(line)) {
+            out.push(`</div>`);
             out.push(`<span class="heading">${escapeHtml(line.toUpperCase())}</span>`);
+            out.push(`<div class="note-block">`);
             continue;
         }
 
         out.push(escapeHtml(line));
     }
+
+    out.push(`</div>`);
 
     return out.join("\n");
 }
