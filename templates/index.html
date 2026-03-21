@@ -93,6 +93,7 @@
             font-weight: 900;
             color: #1d3557;
             margin-bottom: 12px;
+            line-height: 1.5;
         }
         .heading {
             display: block;
@@ -128,7 +129,7 @@
             letter-spacing: 0.5px;
         }
 
-        /* PREMIUM NOTES BOXES */
+        /* Premium note boxes */
         .note-block {
             background: #f8fbff;
             border-left: 5px solid #1d3557;
@@ -136,7 +137,6 @@
             margin-bottom: 12px;
             border-radius: 8px;
         }
-
         .note-block-trap {
             background: #fff5f5;
             border-left: 5px solid #c1121f;
@@ -144,7 +144,6 @@
             margin-bottom: 12px;
             border-radius: 8px;
         }
-
         .note-block-takeaway {
             background: #f3e8ff;
             border-left: 5px solid #7c3aed;
@@ -165,7 +164,6 @@
             text-transform: uppercase;
             letter-spacing: 0.4px;
         }
-
         .mcq-heading-options {
             display: block;
             font-weight: 900;
@@ -177,7 +175,6 @@
             text-transform: uppercase;
             letter-spacing: 0.4px;
         }
-
         .mcq-heading-answer {
             display: block;
             font-weight: 900;
@@ -189,7 +186,6 @@
             text-transform: uppercase;
             letter-spacing: 0.4px;
         }
-
         .mcq-heading-logic {
             display: block;
             font-weight: 900;
@@ -201,7 +197,6 @@
             text-transform: uppercase;
             letter-spacing: 0.4px;
         }
-
         .mcq-heading-trap {
             display: block;
             font-weight: 900;
@@ -213,7 +208,6 @@
             text-transform: uppercase;
             letter-spacing: 0.4px;
         }
-
         .mcq-heading-wrong {
             display: block;
             font-weight: 900;
@@ -225,7 +219,6 @@
             text-transform: uppercase;
             letter-spacing: 0.4px;
         }
-
         .mcq-card {
             background: #ffffff;
             border: 1px solid #d9e2ec;
@@ -234,7 +227,6 @@
             margin-top: 16px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
-
         .mcq-answer-value {
             display: inline-block;
             margin-top: 4px;
@@ -296,51 +288,57 @@ function formatNotesText(text) {
     const rawLines = text.replace(/\r/g, "").split("\n");
     const out = [];
     let firstNonEmptyHandled = false;
+    let blockOpen = false;
 
-    out.push(`<div class="note-block">`);
+    function openBlock(cls) {
+        out.push(`<div class="${cls}">`);
+        blockOpen = true;
+    }
+
+    function closeBlock() {
+        if (blockOpen) {
+            out.push(`</div>`);
+            blockOpen = false;
+        }
+    }
 
     for (let i = 0; i < rawLines.length; i++) {
         let line = cleanMarkdownLine(rawLines[i]);
 
-        if (!line) {
-            out.push("");
-            continue;
-        }
+        if (!line) continue;
 
         if (!firstNonEmptyHandled) {
-            out.push(`</div>`);
             out.push(`<span class="topic">${escapeHtml(line)}</span>`);
-            out.push(`<div class="note-block">`);
+            openBlock("note-block");
             firstNonEmptyHandled = true;
             continue;
         }
 
         if (/^UPSC Trap Zone\s*⚠?$/i.test(line)) {
-            out.push(`</div>`);
+            closeBlock();
             out.push(`<span class="trap">UPSC TRAP ZONE</span>`);
-            out.push(`<div class="note-block-trap">`);
+            openBlock("note-block-trap");
             continue;
         }
 
         if (/^(Revision Takeaway|One-Line Revision Takeaway)$/i.test(line)) {
-            out.push(`</div>`);
+            closeBlock();
             out.push(`<span class="takeaway">REVISION TAKEAWAY</span>`);
-            out.push(`<div class="note-block-takeaway">`);
+            openBlock("note-block-takeaway");
             continue;
         }
 
         if (/^(Introduction|Background|Core Concepts|Core Features|Urban Layout|Administrative Structure|Political Structure|Economic Features|Important Sites|Important Facts|Geographic References|Chronology|Key Facts Table|Exam Focus|Quick Revision Flow)$/i.test(line)) {
-            out.push(`</div>`);
+            closeBlock();
             out.push(`<span class="heading">${escapeHtml(line.toUpperCase())}</span>`);
-            out.push(`<div class="note-block">`);
+            openBlock("note-block");
             continue;
         }
 
         out.push(escapeHtml(line));
     }
 
-    out.push(`</div>`);
-
+    closeBlock();
     return out.join("\n");
 }
 
@@ -362,7 +360,6 @@ function formatMcqText(text) {
 
         if (!line) continue;
 
-        /* Only MAIN MCQ headings start a new card, not statement lines like 1. 2. 3. */
         if (/^\d+\.\s+[A-Z]/.test(line)) {
             pushCard();
             current.push(`<b>${escapeHtml(line)}</b>`);
@@ -415,7 +412,6 @@ function formatMcqText(text) {
     }
 
     pushCard();
-
     return cards.join("");
 }
 
