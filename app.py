@@ -76,22 +76,29 @@ Rules for this section:
 - If exact PYQs are not found, list only closely related PYQs from the same PYQ source
 - For every PYQ mention the year like:
 2019 - UPSC Prelims
-- Then write the full question and answer
-- After each PYQ, include a small block exactly with this heading:
+- After the year, always use these exact labels:
+Question:
+Correct Answer:
 PYQ INSIGHT:
-- Under PYQ INSIGHT include only these four points:
-  - Concept tested
-  - Why UPSC asked this
-  - Pattern or repetition
-  - One-line learning takeaway
-- After PYQ INSIGHT, include another small block exactly with this heading:
 PYQ TAG:
-- Under PYQ TAG include only these three points:
+- Do NOT use "Q:" anywhere
+- Do NOT use shortened labels
+- Write the full question under Question:
+- Write the answer under Correct Answer:
+- Under PYQ INSIGHT include only these five points:
+  - Concept Tested
+  - Why UPSC asked this
+  - Pattern/Trend
+  - Elimination Hint
+  - One-line Takeaway
+- Under PYQ TAG include only these four points:
   - Topic Frequency
-  - Last Asked
-  - Trend
+  - Last Asked Year
+  - Nature
+  - Difficulty
 - For Topic Frequency use only one of these: High / Medium / Low
-- For Trend use only one of these: Static / Conceptual / Analytical
+- For Nature use only one of these: Factual / Conceptual / Analytical
+- For Difficulty use only one of these: Easy / Moderate / Tough
 - Keep PYQ INSIGHT and PYQ TAG crisp, exam-oriented, and useful
 - Do NOT fabricate PYQs
 - Do NOT fabricate fake years inside PYQ text
@@ -152,6 +159,17 @@ STRICT DIFFICULTY:
 - 5 moderate
 - 2 tough
 
+STRICT FORMAT:
+- Do NOT use Q:
+- Always use the full word Question:
+- Always use these exact labels:
+Question:
+Options:
+Correct Answer:
+Elimination Logic:
+Why other options are wrong:
+Trap Zone:
+
 ADVANCED UPSC RULES:
 1. Questions must resemble real UPSC PYQs.
 2. Avoid direct/static questions.
@@ -163,6 +181,7 @@ ADVANCED UPSC RULES:
 8. Include chronology-based arrangement in at least 1 question.
 9. Include map/location logic in at least 1 question.
 10. Include at least 1 question based on a small NCERT fact.
+11. Wherever useful, connect the practice questions to the same concept family seen in PYQs, but do not simply repeat the PYQ.
 
 FOR EACH MCQ GIVE:
 1. Question
