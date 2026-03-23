@@ -77,6 +77,14 @@ Rules for this section:
 - For every PYQ mention the year like:
 2019 - UPSC Prelims
 - Then write the full question and answer
+- After each PYQ, include a small block exactly with this heading:
+PYQ INSIGHT:
+- Under PYQ INSIGHT include only these four points:
+  - Concept tested
+  - Why UPSC asked this
+  - Pattern or repetition
+  - One-line learning takeaway
+- Keep PYQ INSIGHT crisp, exam-oriented, and useful
 - Do NOT fabricate PYQs
 - Do NOT say "based on general knowledge"
 - If no exact or closely related PYQs are found in the uploaded PYQ source, write exactly:
