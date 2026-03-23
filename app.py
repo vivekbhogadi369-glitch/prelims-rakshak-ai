@@ -170,6 +170,21 @@ Elimination Logic:
 Why other options are wrong:
 Trap Zone:
 
+PYQ-MCQ LINKAGE RULE (VERY IMPORTANT):
+- The MCQs must be conceptually linked to the PYQs listed in Section A.
+- Do NOT repeat the same PYQ.
+- Instead:
+  - Twist the concept
+  - Expand the concept
+  - Interlink related topics
+  - Increase difficulty level
+- Examples of linkage:
+  - If PYQ is on temple architecture -> MCQs should include styles, regions, dynasties, chronology
+  - If PYQ is on INC sessions -> MCQs should include resolutions, leaders, timeline, ideological differences
+  - If PYQ is on Buddhism -> MCQs should include councils, sects, doctrines, geography
+- Goal:
+  - Help student understand UPSC pattern, not just memorize questions
+
 ADVANCED UPSC RULES:
 1. Questions must resemble real UPSC PYQs.
 2. Avoid direct/static questions.
