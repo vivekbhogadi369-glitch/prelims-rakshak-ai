@@ -384,6 +384,8 @@ function formatPyqText(text) {
         let line = cleanMarkdownLine(rawLines[i]);
         if (!line) continue;
 
+        line = line.replace(/Past 15 years/gi, "Past 10 Years");
+
         if (/^20\d{2}\s*-\s*UPSC Prelims$/i.test(line)) {
             pushCard();
             current.push(`<span class="pyq-year">${escapeHtml(line)}</span>`);
@@ -508,7 +510,7 @@ function formatNotesText(text) {
             continue;
         }
 
-        if (/^(Introduction|Background|Core Concepts|Core Features|Urban Layout|Administrative Structure|Political Structure|Economic Features|Important Sites|Important Facts|Geographic References|Chronology|Key Facts Table|Exam Focus|Quick Revision Flow)$/i.test(line)) {
+        if (/^(Introduction|Background|Core Concepts|Core Features|Urban Layout|Administrative Structure|Political Structure|Economic Features|Important Sites|Chronology)$/i.test(line)) {
             closeBlock();
             out.push(`<span class="heading">${escapeHtml(line.toUpperCase())}</span>`);
             openBlock("note-block");
@@ -612,7 +614,7 @@ function buildSections(answer) {
 
     return `
 <details class="section" open>
-<summary>▼ PYQs</summary>
+<summary>▼ PYQs (Past 10 Years)</summary>
 <div class="section-content">${formatPyqText(pyqText)}</div>
 </details>
 
