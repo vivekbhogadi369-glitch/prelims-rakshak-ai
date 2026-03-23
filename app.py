@@ -84,8 +84,17 @@ PYQ INSIGHT:
   - Why UPSC asked this
   - Pattern or repetition
   - One-line learning takeaway
-- Keep PYQ INSIGHT crisp, exam-oriented, and useful
+- After PYQ INSIGHT, include another small block exactly with this heading:
+PYQ TAG:
+- Under PYQ TAG include only these three points:
+  - Topic Frequency
+  - Last Asked
+  - Trend
+- For Topic Frequency use only one of these: High / Medium / Low
+- For Trend use only one of these: Static / Conceptual / Analytical
+- Keep PYQ INSIGHT and PYQ TAG crisp, exam-oriented, and useful
 - Do NOT fabricate PYQs
+- Do NOT fabricate fake years inside PYQ text
 - Do NOT say "based on general knowledge"
 - If no exact or closely related PYQs are found in the uploaded PYQ source, write exactly:
 No PYQs came from this subtopic so far.
