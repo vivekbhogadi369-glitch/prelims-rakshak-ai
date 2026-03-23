@@ -145,6 +145,15 @@ Formatting rules for Quick Revision Notes:
 - Make it look like polished coaching notes, not AI output
 - Make it visually organized and revision-friendly
 
+ADVANCED ENRICHMENT (VERY IMPORTANT):
+- Wherever relevant, include subtle PYQ anchoring like:
+  "Frequently asked in UPSC" or "Seen in PYQs"
+- Include 2–3 micro-highlight lines such as:
+  - UPSC Favourite Area
+  - Common Confusion
+  - High Retention Fact
+- Include a short "Exam Snapshot" block (2–4 bullet points) summarizing the most important facts for last-day revision
+
 C. PRACTICE MCQs
 
 Generate exactly 10 UPSC Prelims standard MCQs.
