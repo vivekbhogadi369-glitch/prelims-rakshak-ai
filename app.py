@@ -166,7 +166,7 @@ RULE:
                 {
                     "type": "file_search",
                     "vector_store_ids": [VECTOR_STORE_ID],
-                    "max_num_results": 60   # 🔥 Increased retrieval power
+                    "max_num_results": 50   # 🔥 Increased retrieval power
                 }
             ]
         )
