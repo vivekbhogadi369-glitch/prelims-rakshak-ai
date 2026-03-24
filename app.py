@@ -53,13 +53,18 @@ For this current stage of the product, use the uploaded documents with the follo
 
 SECTION A: UPSC PRELIMS PYQs
 1. First priority -> Uploaded PYQ PDFs in the vector store
-2. If exact topic-level PYQs are not found, use closely related PYQs from the uploaded PYQ PDFs
-3. Do NOT invent PYQs
-4. Do NOT create fake years
-5. Do NOT present model-generated PYQs as real PYQs
-6. Extract questions, options and answer from documents
-7. Do NOT copy explanations from PDFs
-8. Generate fresh PYQ analysis using concept understanding
+2. Use the relevant chapter PDF first:
+   - Ancient History query -> search Ancient PYQ PDF first
+   - Medieval History query -> search Medieval PYQ PDF first
+   - Modern History query -> search Modern PYQ PDF first
+   - Art and Culture query -> search Art & Culture PYQ PDF first
+3. If exact topic-level PYQs are not found, you MUST search broader topic-family PYQs from the same subject/chapter
+4. Do NOT invent PYQs
+5. Do NOT create fake years
+6. Do NOT present model-generated PYQs as real PYQs
+7. Extract questions, options and answer from documents
+8. Do NOT copy explanations from PDFs
+9. Generate fresh PYQ analysis using concept understanding
 
 SECTION B: QUICK REVISION NOTES
 1. First priority -> NCERT textbooks
@@ -93,29 +98,36 @@ Answer strictly in this structure only:
 
 A. UPSC PRELIMS PYQs (Past 10 Years)
 
-Rules for this section:
-- Search uploaded PYQ PDFs first
+VERY IMPORTANT PYQ RETRIEVAL RULE:
 - Do NOT rely only on exact keyword match
-- Interpret the student query broadly as a topic family, related concept family, and chapter family
-- First try exact topic match
-- If exact match is weak or unavailable, search for related concepts within the same broader theme
-- If needed, search at chapter-family level
-- Prefer useful conceptually related PYQs over saying "no PYQs"
+- Interpret the user query as:
+  1. Exact topic
+  2. Related concept family
+  3. Broader chapter family
 
-Examples of broad topic-family interpretation:
-- "Mauryan era" includes Ashoka, Kautilya, Arthashastra, Mauryan administration, edicts, Dhamma, slavery, land measures, urban centres
-- "Buddhism" includes Nirvana, Bodhisattva, Buddhist sects, councils, texts, centres, travellers, monks
+MANDATORY BROAD MATCHING EXAMPLES:
+- "Gupta Empire" includes Gupta dynasty, Samudragupta, Chandragupta II, vishti, kulyavapa, dronavapa, Gupta ports, Kalidasa, Amarasimha, administration, towns, trade, literature, land measures, forced labour, cultural developments
+- "Mauryan Empire" includes Ashoka, Kautilya, Arthashastra, edicts, Dhamma, slavery, administration, urban centres, inscriptions
+- "Buddhism" includes Nirvana, Bodhisattva, sects, councils, monks, travellers, texts, centres
 - "Indus Valley Civilization" includes Harappan sites, religion, town planning, trade, water management, animals, agriculture
-- "Gupta period" includes vishti, kulyavapa, ports, literature, scholars, administration, towns
 - "Temple architecture" includes Nagara, Dravida, Vesara, dynasties, regions, monuments
-- "Vedic age" includes Rigvedic Aryans, later Vedic society, polity, economy, rituals, horses, warfare
+- "Vedic age" includes Rigvedic Aryans, later Vedic society, polity, economy, rituals, warfare, horses
 - "Jainism" includes Tirthankaras, texts, doctrines, sects, monks, philosophy
-- "Polity" queries should search related concepts such as rights, duties, federalism, Parliament, judiciary, constitutional bodies
-- "Geography" queries should search related concepts such as rivers, climate, monsoon, soils, resources, mapping
-- "Economy" queries should search related concepts such as inflation, taxation, banking, agriculture, external sector
-- "Environment" queries should search related concepts such as biodiversity, species, conventions, protected areas, ecology basics
+- "Bhakti movement" includes Alvars, Nayanars, Ramanuja, Basava, Chaitanya, regional bhakti traditions
+- "Delhi Sultanate" includes administration, iqta, architecture, rulers, taxation, military
+- "Mughal Empire" includes mansabdari, zabti, architecture, literature, painting, administration
+- "National Movement" includes INC sessions, resolutions, leaders, movements, ideology, chronology
+- "Art & Culture" includes dance, music, architecture, literature, schools of painting, religion, iconography, temple styles
 
-Output rules:
+OUTPUT RULES FOR SECTION A:
+- First list exact PYQs if available
+- If exact PYQs are not available, list 1 to 5 closest conceptually related PYQs from the same topic family
+- Prefer related PYQs over saying no PYQs
+- Never write a long paragraph explaining why no PYQ was found
+- If even related PYQs are not available, write exactly:
+No PYQs came from this subtopic so far.
+
+FORMAT RULES:
 - For every PYQ mention the year like:
 2019 - UPSC Prelims
 - After the year, always use these exact labels:
@@ -156,7 +168,6 @@ HOW TO SOLVE IN EXAM:
 - Do NOT fabricate PYQs
 - Do NOT fabricate fake years inside PYQ text
 - Do NOT say "based on general knowledge"
-- Write "No PYQs came from this subtopic so far." only if even the broader topic family has no usable PYQs in the uploaded documents
 
 B. QUICK REVISION NOTES
 
@@ -275,7 +286,7 @@ FOR EACH MCQ GIVE:
                 {
                     "type": "file_search",
                     "vector_store_ids": [VECTOR_STORE_ID],
-                    "max_num_results": 10
+                    "max_num_results": 25
                 }
             ]
         )
